@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Session Booking Request</title>
+</head>
+<body>
+  <p>Hello {{recipientName}},</p>
+  <p>
+    {{creatorName}} has requested a session with you on Leap-On Mentorship. Here are the details:
+  </p>
+  <ul>
+    <li><strong>Date:</strong> {{date}}</li>
+    <li><strong>Time:</strong> {{time}}</li>
+    <li><strong>Topic:</strong> {{topic}}</li>
+    <li><strong>Description:</strong> {{description}}</li>
+  </ul>
+  <p>
+    Please click one of the following options to respond:
+  </p>
+  <p>
+    <a href="{{acceptUrl}}" style="color: green; text-decoration: none;">Accept</a> | 
+    <a href="{{rejectUrl}}" style="color: red; text-decoration: none;">Reject</a>
+  </p>
+  <p>Best regards,<br>Leap-On Mentorship Team</p>
+</body>
+</html>
