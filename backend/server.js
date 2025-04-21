@@ -40,19 +40,12 @@ app.set('io', io);
 
 // Middleware
 const allowedOrigins = [
-  'http://localhost:5173',
-  'https://leap-on-mentorship-program-xkjq.vercel.app',
-  'https://leapon.onrender.com'
+  'https://leap-on-ng.vercel.app',
+  'https://leap-on-ng.onrender.com'
 ];
 
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, origin);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: process.env.FRONTEND_URL, // Allow requests from the frontend URL
   credentials: true, // Allow cookies and credentials
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed HTTP methods
   allowedHeaders: ['Authorization', 'Content-Type']

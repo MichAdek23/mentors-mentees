@@ -6,7 +6,7 @@ import Conversation from './models/Conversation.js';
 const initializeSocket = (server) => {
   const io = new Server(server, {
     cors: {
-      origin: process.env.CLIENT_URLS || 'http://localhost:5173', 
+      origin: process.env.CLIENT_URLS || 'https://leap-on-ng.vercel.app', 
       methods: ['GET', 'POST'],
       credentials: true,
       allowedHeaders: ['Authorization', 'Content-Type'],
