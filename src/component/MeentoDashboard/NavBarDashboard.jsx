@@ -19,7 +19,7 @@ function NavBarDashboard() {
     <section className="fixed top-0 left-0 h-full bg-white text-white pt-10">
       {/* Logo Section */}
       <div className="w-full flex justify-center items-center">
-         <h1 className = "text-orange-400 text-2xl font-bold"> Leap Mentorship</h1>
+      <h1 className=' text-xl md:text-2xl font-bold text-orange-400 '>Leap Mentorship</h1>
       </div>
 
       {/* Navigation Links */}

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import NavBarDashboard from '../NavBarDashboard';
-import NavRes from '../NavRes';
 import MenteeProfile from './MenteeProfile';
 import { useAuth } from '../../lib/AuthContext';
 import Overview from '../MeentoDashboard/MenteePages/Overview';
 import Booking from '../MeentoDashboard/MentorPages/Booking';
 import Explore from '../MeentoDashboard/MentorPages/Explore';
 import Message from '../MeentoDashboard/MentorPages/Message';
+import NavBarDashboard from '../MeentoDashboard/NavBarDashboard';
+import NavRes from '../MeentoDashboard/NavRes';
 
 const MenteeDashboard = () => {
   const { user, loading } = useAuth();
@@ -48,10 +48,10 @@ const MenteeDashboard = () => {
   return (
     <div className="flex">
       <div className="hidden lg:block">
-        <NavBarDashboard activeComponent={activeComponent} setActiveComponent={setActiveComponent} />
+       <NavBarDashboard activeComponent={activeComponent} setActiveComponent={setActiveComponent}/>
       </div>
       <div className="lg:hidden">
-        <NavRes activeComponent={activeComponent} setActiveComponent={setActiveComponent} />
+       <NavRes activeComponent={activeComponent} setActiveComponent={setActiveComponent} />
       </div>
       <div className="flex-1  h-screen ">
         {renderActiveComponent()}

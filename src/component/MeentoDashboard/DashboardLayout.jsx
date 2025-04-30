@@ -14,10 +14,10 @@ const DashboardLayout = ({ children }) => {
   return (
     <div className="flex min-h-screen">
       {/* Sidebar Navigation */}
-      <aside className="w-64 bg-white-800 text-white p-4">
+      <aside className="w-64 bg-white  p-4">
         {/* Logo Section */}
         <div className="w-full flex justify-center items-center mb-10">
-          <img src="/image/logo.png.png" className="h-10" alt="Logo" />
+           <h1 className=' text-xl md:text-2xl font-bold text-orange-400 '>Leap Mentorship</h1>
         </div>
 
         {/* Navigation Links */}

@@ -15,7 +15,7 @@ function Overview() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch user profile data
+      
         const profileResponse = await userApi.getProfile(token); // Pass token to API
         setUserData(profileResponse.data);
         console.log('Fetched user data:', profileResponse.data);
@@ -164,34 +164,7 @@ function Overview() {
           />
         </div>
 
-        {/* Upcoming Sessions Section */}
-        <div className="bg-white p-5 shadow-2xl rounded-lg md:w-[40%] lg:w-[33%]">
-          <h2 className="text-lg font-medium mb-4">Upcoming Sessions</h2>
-          {acceptedMentors && acceptedMentors.length > 0 ? (
-            <div className="space-y-4">
-              {acceptedMentors.map((mentor, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={mentor.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(mentor.firstName + ' ' + mentor.lastName)}&background=random`}
-                      alt={mentor.firstName + ' ' + mentor.lastName}
-                      className="w-10 h-10 rounded-full"
-                    />
-                    <div>
-                      <h3 className="font-medium">{mentor.firstName} {mentor.lastName}</h3>
-                      <p className="text-sm text-gray-600">{mentor.title || 'Mentor'}</p>
-                    </div>
-                  </div>
-                  <button className="text-customOrange hover:text-orange-600">
-                    View Details
-                  </button>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-600">No upcoming sessions</p>
-          )}
-        </div>
+        
       </section>
 
       {/* Statistics Section */}
@@ -236,6 +209,35 @@ function Overview() {
               </div>
             </div>
           </div>
+
+          {/* Upcoming Sessions Section */}
+        {/* <div className="bg-white p-5 shadow-2xl rounded-lg md:w-[40%] lg:w-[33%]">
+          <h2 className="text-lg font-medium mb-4">Upcoming Sessions</h2>
+          {acceptedMentors && acceptedMentors.length > 0 ? (
+            <div className="space-y-4">
+              {acceptedMentors.map((mentor, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={mentor.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(mentor.firstName + ' ' + mentor.lastName)}&background=random`}
+                      alt={mentor.firstName + ' ' + mentor.lastName}
+                      className="w-10 h-10 rounded-full"
+                    />
+                    <div>
+                      <h3 className="font-medium">{mentor.firstName} {mentor.lastName}</h3>
+                      <p className="text-sm text-gray-600">{mentor.title || 'Mentor'}</p>
+                    </div>
+                  </div>
+                  <button className="text-customOrange hover:text-orange-600">
+                    View Details
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-600">No upcoming sessions</p>
+          )}
+        </div> */}
         </div>
       </section>
     </section>

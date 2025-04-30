@@ -117,17 +117,17 @@ const PublicProfile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
+    <div className="h-screen bg-gray-50  p-4">
       {/* Header */}
       <header className="flex items-center justify-between mb-8">
         <button
-          onClick={() => navigate(-1)} // Go back to the previous page
-          className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white"
+          onClick={() => navigate(-1)} 
+          className="text-gray-600  hover:text-gray-800 "
         >
           <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
           Back
         </button>
-        <h1 className="text-[32px] font-medium text-gray-900 dark:text-white">
+        <h1 className="text-[32px] font-medium text-gray-900 ">
           Public Profile
         </h1>
       </header>

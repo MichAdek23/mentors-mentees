@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Star, BookOpen, Users } from 'lucide-react';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faRemove } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faRemove, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { faTwitter, faFacebook, faWhatsapp, faInstagram } from '@fortawesome/free-brands-svg-icons';
 import EditProfile from './EditProfile';
 import { useContext } from 'react';
 import { GlobalContext } from '@/component/GlobalStore/GlobalState';
 import { userApi } from '../../../lib/api';
+import { useNavigate } from 'react-router-dom';
 
 // Add icons to the library
 library.add(faBars, faRemove, faTwitter, faFacebook, faWhatsapp, faInstagram);
@@ -57,6 +58,7 @@ const defaultProfile = {
 const Profile = () => {
   const [isEditProfileVisible, setEditProfileVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+   const navigate = useNavigate();
   const [error, setError] = useState(null);
   const { upDatePage, handleToggleState, acceptedMentors, profile = defaultProfile, setProfile } = useContext(GlobalContext);
   
@@ -162,6 +164,19 @@ const Profile = () => {
             />
           </div>
         </div>
+
+          <header className="flex lg:hidden items-center justify-between mb-8">
+                <button
+                  onClick={() => navigate(-1)} 
+                  className="text-gray-600  hover:text-gray-800 "
+                >
+                  <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
+                  Back
+                </button>
+                <h1 className="text-[32px] font-medium text-gray-900 ">
+                  Public Profile
+                </h1>
+              </header>
         <div onClick={handleToggleState} className="block lg:hidden mt-3">
           <button aria-label="Toggle menu">
             <FontAwesomeIcon icon={faBars} />
