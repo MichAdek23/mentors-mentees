@@ -77,7 +77,7 @@ const PublicProfile = () => {
             Authorization: `Bearer ${token}`, // Include the token in the Authorization header
           },
           body: JSON.stringify({
-            recipientId: userId, // Ensure recipientId is sent correctly
+            recipientId: userId, 
           }),
         }
       );

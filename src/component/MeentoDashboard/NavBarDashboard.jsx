@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 function NavBarDashboard() {
   const { upDatePage, activeComponent } = useContext(GlobalContext);
-  const { user, logout } = useAuth();
+  const {  logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -16,10 +16,10 @@ function NavBarDashboard() {
   };
 
   return (
-    <section className="fixed top-0 left-0 h-full bg-gray-800 text-white pt-10">
+    <section className="fixed top-0 left-0 h-full bg-white text-white pt-10">
       {/* Logo Section */}
       <div className="w-full flex justify-center items-center">
-        <img src="/image/logo.png.png" className="h-10" alt="Logo" />
+         <h1 className = "text-orange-400 text-2xl font-bold"> Leap Mentorship</h1>
       </div>
 
       {/* Navigation Links */}

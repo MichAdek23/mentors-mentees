@@ -7,14 +7,14 @@ const DashboardLayout = ({ children }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem('token'); // Clear token or any other logout logic
+    localStorage.removeItem('token'); 
     navigate('/login');
   };
 
   return (
     <div className="flex min-h-screen">
       {/* Sidebar Navigation */}
-      <aside className="w-64 bg-gray-800 text-white p-4">
+      <aside className="w-64 bg-white-800 text-white p-4">
         {/* Logo Section */}
         <div className="w-full flex justify-center items-center mb-10">
           <img src="/image/logo.png.png" className="h-10" alt="Logo" />
