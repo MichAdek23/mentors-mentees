@@ -236,7 +236,7 @@ const Messages = () => {
       <div className="container mx-auto px-4 max-w-6xl h-[calc(100vh-12rem)]">
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm h-full flex">
           {/* Conversations List */}
-          <div className="w-1/3 border-r dark:border-gray-700">
+          <div className="w-1/3 border-r hidden md:block dark:border-gray-700">
             <div className="p-4 border-b dark:border-gray-700">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />

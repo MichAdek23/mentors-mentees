@@ -25,7 +25,7 @@ const Profile = () => {
   const [isEditProfileVisible, setEditProfileVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { profile, setProfile } = useContext(GlobalContext);
+  const { profile, setProfile, toggleState  } = useContext(GlobalContext);
   const { token } = useAuth(); // Get token from useAuth
 
   const fetchProfile = async () => {
@@ -133,7 +133,14 @@ const Profile = () => {
   };
 
   return (
-    <div className="h-fit bg-gray-50 dark:bg-gray-900 pb-8">
+    <section className="h-fit bg-gray-50 dark:bg-gray-900 pb-8">
+      <section>
+       <div className={`${toggleState ? 'translate-x-0' : 'translate-x-full'} transition-transform duration-300 fixed h-screen z-50 top-0 bg-white w-full`}>
+                <NavRes/>
+            </div>
+            <section className='hidden lg:block h-screen w-[18%]'>
+                <NavBarDashboard/>
+            </section>
       <header className="flex mt-4 justify-between px-4 mb-8">
         <h1 className="text-2xl font-medium">My Profile</h1>
       </header>
@@ -162,7 +169,7 @@ const Profile = () => {
               </div>
             </div>
             <div className="pt-20 px-8">
-              <div className="flex justify-between items-start">
+              <div className="flex flex-wrap justify-between items-start">
                 <div className="space-y-2">
                   <h1 className="text-gray-800 dark:text-gray-200 text-2xl font-semibold">
                     {profile?.firstName || 'N/A'} {profile?.lastName || 'N/A'}
@@ -184,7 +191,7 @@ const Profile = () => {
                   Edit Profile
                 </button>
               </div>
-              <div className="mt-12 bg-slate-200 px-8 py-8 rounded-3xl">
+              <div className="mt-12 break-words bg-slate-200 px-3 py-2 md:px-8 md:py-8 rounded-3xl">
                 <h2 className="text-lg font-semibold mb-2">Overview</h2>
                 <div className="space-y-6">
                   <p className="text-gray-600 dark:text-gray-400 max-w-3xl">
@@ -207,7 +214,11 @@ const Profile = () => {
           </div>
         </div>
       )}
-    </div>
+      </section>
+      </section>
+   
+    
+    
   );
 };
 

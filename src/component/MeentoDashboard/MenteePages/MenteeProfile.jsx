@@ -138,7 +138,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="h-fit bg-gray-50 dark:bg-gray-900 pb-8">
+    <div className="h-screen lg:h-fit  bg-gray-50 dark:bg-gray-900 pb-8">
       <header className="flex mt-4 justify-between px-4 mb-8">
         <div className="flex flex-col w-full lg:flex-row justify-start items-start lg:items-center gap-4 lg:gap-0 lg:justify-between">
           <div className="flex flex-col gap-4">
@@ -208,7 +208,7 @@ const Profile = () => {
               </div>
             </div>
             <div className="pt-20 px-8">
-              <div className="flex justify-between items-start">
+              <div className=" block md:flex  justify-between items-start">
                 <div className="space-y-2">
                   <h1 className="text-gray-800 dark:text-gray-200 text-2xl font-semibold">
                     {profile?.firstName || ''} {profile?.lastName || ''}
@@ -286,7 +286,7 @@ const Profile = () => {
                   ))}
                 </div>
               </div>
-              <div className="mt-12 bg-slate-200 px-8 py-8 rounded-3xl">
+              <div className="mt-12 bg-slate-200 flex flex-col flex-wrap px-8 py-8 rounded-3xl">
                 <h2 className="text-lg font-semibold mb-2">Overview</h2>
                 <div className="space-y-6">
                   <p className="text-gray-600 dark:text-gray-400 max-w-3xl">

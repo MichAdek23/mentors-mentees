@@ -87,7 +87,7 @@ const MenteeProfile = () => {
         <div className="flex flex-col w-full lg:flex-row justify-start items-start lg:items-center gap-4 lg:gap-0 lg:justify-between">
           <div className="flex flex-col gap-4">
             <h1 className="text-2xl font-medium">My profile</h1>
-            <p className="text-base font-medium text-slate-600">Eas Communication with everyone</p>
+            <p className="text-base font-medium text-slate-600">Ease Communication with everyone</p>
           </div>
           <div className="flex justify-center gap-4">
             <img
