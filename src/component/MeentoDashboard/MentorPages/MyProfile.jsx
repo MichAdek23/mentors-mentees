@@ -188,7 +188,7 @@ const Profile = () => {
                   className="text-orange-500 hover:text-orange-600 font-medium"
                   onClick={toggleEditProfile}
                 >
-                  Edit Profile
+                  Edit 
                 </button>
               </div>
               <div className="mt-12 break-words bg-slate-200 px-3 py-2 md:px-8 md:py-8 rounded-3xl">
