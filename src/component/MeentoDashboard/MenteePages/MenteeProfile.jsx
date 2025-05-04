@@ -142,7 +142,7 @@ const Profile = () => {
       <header className="flex mt-4 justify-between px-4 mb-8">
         <div className="flex flex-col w-full lg:flex-row justify-start items-start lg:items-center gap-4 lg:gap-0 lg:justify-between">
           <div className="flex flex-col gap-4">
-            <h1 className="text-2xl font-medium">My profile</h1>
+            <h1 className="text-2xl font-medium"> profile</h1>
             <p className="text-base font-medium text-slate-600">
               {acceptedMentors && acceptedMentors.length > 0
                 ? `You have ${acceptedMentors.length} upcoming session${acceptedMentors.length > 1 ? 's' : ''}`
