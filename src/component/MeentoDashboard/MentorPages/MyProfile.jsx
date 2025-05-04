@@ -133,7 +133,7 @@ const Profile = () => {
   };
 
   return (
-    <section className="h-fit bg-gray-50 dark:bg-gray-900 pb-8">
+    <section className="h-fit bg-gray-900 dark:bg-gray-900 pb-8">
       <section>
        <div className={`${toggleState ? 'translate-x-0' : 'translate-x-full'} transition-transform duration-300 fixed h-screen z-50 top-0 bg-white w-full`}>
                 <NavRes/>
@@ -142,7 +142,7 @@ const Profile = () => {
                 <NavBarDashboard/>
             </section>
       <header className="flex mt-4 justify-between px-4 mb-8">
-        <h1 className="text-2xl font-medium">My Profile</h1>
+        <h1 className="text-2xl font-medium">My </h1>
       </header>
       <div className="container mx-auto px-4 max-w-6xl">
         {error && (
@@ -188,7 +188,7 @@ const Profile = () => {
                   className="text-orange-500 hover:text-orange-600 font-medium"
                   onClick={toggleEditProfile}
                 >
-                  Edit 
+                  Edit Profile
                 </button>
               </div>
               <div className="mt-12 break-words bg-slate-200 px-3 py-2 md:px-8 md:py-8 rounded-3xl">

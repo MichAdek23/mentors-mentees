@@ -46,7 +46,7 @@ const MenteeDashboard = () => {
   };
 
   return (
-    <div className="flex bg-red-600">
+    <div className="flex ">
       <div className="hidden lg:block">
        <NavBarDashboard activeComponent={activeComponent} setActiveComponent={setActiveComponent}/>
       </div>
