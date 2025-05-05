@@ -108,7 +108,7 @@ const CreateSession = () => {
       <div className="h-screen flex items-center justify-center">
         <div className="text-red-500 text-center p-4">
           <p className="text-lg font-medium">Error loading connected users</p>
-          <p className="text-sm">{error}</p>
+          <p className="text-sm">{ error}</p>
         </div>
       </div>
     );
