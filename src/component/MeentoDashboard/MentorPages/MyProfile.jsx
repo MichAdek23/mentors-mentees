@@ -138,7 +138,7 @@ const Profile = () => {
   return (
     <section className="h-fit  dark:bg-gray-900 pb-8">
    
-     <header className="flex justify-between mb-6">
+     <header className="flex justify-between mb-6 px-3 lg:px-0">
                     <div className="flex flex-col w-full lg:flex-row justify-start items-start lg:items-center gap-4 lg:gap-0 lg:justify-between">
                         <div className="flex flex-col gap-4">
                             <h1 className="text-[32px] font-medium">My Profile</h1>
