@@ -25,6 +25,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { useDebounce } from '../../../hooks/useDebounce';
 import { useSearchParams } from 'react-router-dom'; // Import useSearchParams
 import "./Message.css";
+import { useCallback } from 'react';
 
 const socket = io(`${import.meta.env.VITE_API_URL}/messages`, {
   transports: ['websocket', 'polling'], // Use WebSocket and fallback to polling
@@ -189,7 +190,7 @@ const Message = () => {
     if (selectedConversation) {
       loadMessages();
     }
-  }, [selectedConversation]);
+  }, [selectedConversation, loadMessages]); 
 
   useEffect(() => {
     scrollToBottom();
@@ -275,7 +276,8 @@ const Message = () => {
     }
   }, [userIdFromQuery, conversations]);
 
-  const loadMessages = async () => {
+
+  const loadMessages = useCallback(async () => {
     if (!selectedConversation || !selectedConversation._id) {
       console.error('Selected conversation or conversation ID is undefined.');
       return;
@@ -329,7 +331,7 @@ const Message = () => {
       console.error('Error loading messages:', err);
       setError(err.message);
     }
-  };
+  }, [selectedConversation, selectedChatUser]);
 
   const createConversation = async (participant) => {
     try {
