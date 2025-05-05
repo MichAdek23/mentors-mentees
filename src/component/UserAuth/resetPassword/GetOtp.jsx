@@ -34,12 +34,12 @@ function GetOtp() {
   const onSubmit = async (data) => {
     try {
       const otp = Object.values(data).join(''); // Combine OTP fields into a single string
-      const email = localStorage.getItem('email'); // Retrieve email from localStorage
+      const email = localStorage.getItem('resetEmail'); // Retrieve email from localStorage using the correct key
       if (!email) {
-        console.error('Email not found in localStorage'); // Debug log
-        throw new Error('Email is required to verify OTP');
+        console.error('Email not found in localStorage for reset'); // Debug log
+        throw new Error('Email is required to verify OTP for password reset');
       }
-      console.log('Sending OTP verification:', { email, otp }); // Debug log
+      console.log('Sending OTP verification for reset:', { email, otp }); // Debug log
       const response = await userApi.verifyOtp({ email, otp }); // Use userApi method
 
       // Store reset token in localStorage
