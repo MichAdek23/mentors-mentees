@@ -142,10 +142,10 @@ const EditProfile = ({ profile, onUpdate, setIsEditProfileVisible }) => {
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
-        <input name="firstName" value={updatedProfile.firstName} onChange={handleChange} placeholder="First Name" className="p-2 border rounded" />
-        <input name="lastName" value={updatedProfile.lastName} onChange={handleChange} placeholder="Last Name" className="p-2 border rounded" />
-        <input name="email" type="email" value={updatedProfile.email} onChange={handleChange} placeholder="Email" className="p-2 border rounded" />
-        <input name="title" value={updatedProfile.title} onChange={handleChange} placeholder="Title" className="p-2 border rounded" />
+        <input name="firstName" value={updatedProfile.firstName} onChange={handleChange} placeholder="First Name" className="p-2 outline-none  border rounded" />
+        <input name="lastName" value={updatedProfile.lastName} onChange={handleChange} placeholder="Last Name" className="p-2 outline-none  border rounded" />
+        <input name="email" type="email" value={updatedProfile.email} onChange={handleChange} placeholder="Email" className="p-2 outline-none  border rounded" />
+        <input name="title" value={updatedProfile.title} onChange={handleChange} placeholder="Title" className="p-2 border outline-none rounded" />
       </div>
 
       <textarea
@@ -153,7 +153,7 @@ const EditProfile = ({ profile, onUpdate, setIsEditProfileVisible }) => {
         value={updatedProfile.overview}
         onChange={handleChange}
         placeholder="Tell about yourself"
-        className="w-full p-2 border rounded h-28"
+        className="w-full p-2 border rounded h-28 my-3"
       />
 
       <div className="grid md:grid-cols-2 gap-4">
