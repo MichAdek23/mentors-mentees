@@ -19,16 +19,17 @@ library.add(faBars, faRemove, faTwitter, faFacebook, faWhatsapp, faInstagram, fa
 const getImageUrl = (imagePath) => {
   if (!imagePath) return "/image/default-profile.png"; // Default image if no profile picture is provided
   if (imagePath.startsWith('http')) {
-    return imagePath; 
+    return imagePath;
   }
-  return `${import.meta.env.VITE_BACKEND_URL}${imagePath}`; 
+  return `${import.meta.env.VITE_BACKEND_URL}${imagePath}`;
 };
+
 
 const Profile = () => {
   const [isEditProfileVisible, setEditProfileVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { profile, setProfile,  upDatePage, handleToggleState  } = useContext(GlobalContext);
+  const { profile, setProfile, upDatePage, handleToggleState } = useContext(GlobalContext);
   const { token } = useAuth(); // Get token from useAuth
 
   const fetchProfile = async () => {
@@ -53,8 +54,8 @@ const Profile = () => {
           'Content-Type': 'application/json'
         }
       });
- console.log(response, 'response');
-   
+      console.log(response, 'response');
+
       if (!response.ok) {
         throw new Error('Failed to fetch profile data');
       }
@@ -137,36 +138,36 @@ const Profile = () => {
 
   return (
     <section className="h-fit  dark:bg-gray-900 pb-8">
-   
-     <header className="flex justify-between mb-6 px-3 lg:px-0">
-                    <div className="flex flex-col w-full lg:flex-row justify-start items-start lg:items-center gap-4 lg:gap-0 lg:justify-between">
-                        <div className="flex flex-col gap-4">
-                            <h1 className="text-[32px] font-medium">My Profile</h1>
-                        
-                        </div>
-                        <div className="flex justify-center gap-4">
-                            <img
-                                onClick={() => upDatePage("Message")}
-                                src="/image/messageIcon.png"
-                                className="md:w-12 h-9 md:h-12 cursor-pointer"
-                                alt="Message Icon"
-                                loading="lazy"
-                            />
-                            <img
-                                onClick={() => upDatePage("Setting")}
-                                src="/image/settingIcon.png"
-                                className="md:w-12 h-9 md:h-12 cursor-pointer"
-                                alt="Setting Icon"
-                                loading="lazy"
-                            />
-                        </div>
-                    </div>
-                    <div onClick={handleToggleState} className="block lg:hidden mt-3">
-                        <button aria-label="Toggle menu">
-                            <FontAwesomeIcon icon={faBars} />
-                        </button>
-                    </div>
-                </header>
+
+      <header className="flex justify-between mb-6 px-3 lg:px-0">
+        <div className="flex flex-col w-full lg:flex-row justify-start items-start lg:items-center gap-4 lg:gap-0 lg:justify-between">
+          <div className="flex flex-col gap-4">
+            <h1 className="text-[32px] font-medium">My Profile</h1>
+
+          </div>
+          <div className="flex justify-center gap-4">
+            <img
+              onClick={() => upDatePage("Message")}
+              src="/image/messageIcon.png"
+              className="md:w-12 h-9 md:h-12 cursor-pointer"
+              alt="Message Icon"
+              loading="lazy"
+            />
+            <img
+              onClick={() => upDatePage("Setting")}
+              src="/image/settingIcon.png"
+              className="md:w-12 h-9 md:h-12 cursor-pointer"
+              alt="Setting Icon"
+              loading="lazy"
+            />
+          </div>
+        </div>
+        <div onClick={handleToggleState} className="block lg:hidden mt-3">
+          <button aria-label="Toggle menu">
+            <FontAwesomeIcon icon={faBars} />
+          </button>
+        </div>
+      </header>
       <div className="container mx-auto px-4 max-w-6xl">
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
@@ -174,7 +175,7 @@ const Profile = () => {
             <span className="block sm:inline"> {error}</span>
           </div>
         )}
-        
+
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
             <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
@@ -184,11 +185,12 @@ const Profile = () => {
             <div className="h-48 rounded-t-xl bg-gradient-to-r from-blue-400 to-blue-600 relative">
               <div className="absolute -bottom-16 left-8 flex items-end">
                 <img
-                  src={getImageUrl(profile?.profilePicture)}
+                  src={getImageUrl(profile?.profilePicture)} // Correct way to call the function
                   alt={`${profile?.firstName || ''} ${profile?.lastName || ''}`}
                   className="w-32 h-32 rounded-full border-4 border-white dark:border-gray-800"
                   onError={handleImageError}
                 />
+
               </div>
             </div>
             <div className="pt-20 px-8">
@@ -203,7 +205,7 @@ const Profile = () => {
                   {profile?.yearOfStudy && <p className="text-gray-600 dark:text-gray-400">{profile.yearOfStudy}</p>}
                   {profile?.gender && <p className="text-gray-600 dark:text-gray-400">{profile.gender}</p>}
                   {profile?.mentorshipStatus && <p className="text-gray-600 dark:text-gray-400">{profile.mentorshipStatus}</p>}
-                 
+
                   <h2 className="text-xl font-bold mb-4 mt-6">Social Media</h2>
                   {renderSocialLinks()}
                 </div>
@@ -237,11 +239,11 @@ const Profile = () => {
           </div>
         </div>
       )}
-      </section>
-      
-   
-    
-    
+    </section>
+
+
+
+
   );
 };
 
