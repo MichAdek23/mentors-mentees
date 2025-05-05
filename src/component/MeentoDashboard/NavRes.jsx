@@ -12,7 +12,9 @@ function NavRes() {
   return (
     <section className=' z-50 h-full w-full pb-3  pt-10 '>
       <div className=' w-full flex justify-between px-3 items-center '>
-        <img src="/image/logo.png.png" className=' h-8' alt ="" />
+      <div className="w-full flex justify-center items-center">
+      <h1 className=' text-xl md:text-2xl font-bold text-orange-400  '>Leap Mentorship</h1>
+      </div>
         <div className=' cursor-pointer' onClick={handleToggleState}>
             <FontAwesomeIcon className=' text-2xl' icon={faRemove}/>
         </div>
