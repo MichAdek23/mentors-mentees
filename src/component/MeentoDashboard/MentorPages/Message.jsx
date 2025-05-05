@@ -93,7 +93,8 @@ const Message = () => {
       return { firstName: 'Unknown', lastName: 'User', profilePicture: null };
     }
   };
-  
+  console.log(Ae); 
+const Ae = 'Something';
   useEffect(() => {
     const updateConversationsWithDetails = async () => {
       const updatedConversations = await Promise.all(
