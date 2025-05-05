@@ -137,8 +137,8 @@ const Profile = () => {
   };
 
   return (
-    <section className="h-fit bg-gray-900 dark:bg-gray-900 pb-8">
-      <section className=' h-fit md:h-screen '>
+    <section className="h-fit  dark:bg-gray-900 pb-8">
+      <section className=' h-fit md:h-fit '>
        <div className={`${toggleState ? 'translate-x-0' : 'translate-x-full'} transition-transform duration-300 fixed h-screen z-50 top-0 bg-white w-full`}>
                 <NavRes/>
             </div>
