@@ -34,7 +34,7 @@ function MentorDashBoard() {
             <section className='hidden lg:block h-screen w-[18%]'>
                 <NavBarDashboard/>
             </section>
-            <section className='h-screen sidebar md:px-10 lg:px-[34px] bg-slate-100 py-10 w-full'>
+            <section className='h-fit sidebar md:px-10 lg:px-[34px] bg-slate-100 py-10 w-full'>
                 <ActiveComponent/> 
             </section> 
          </main>
