@@ -8,8 +8,7 @@ import EditProfile from './EditProfile';
 import { useContext } from 'react';
 import { GlobalContext } from '@/component/GlobalStore/GlobalState';
 import { useAuth } from '@/lib/AuthContext'; // Import useAuth
-import NavRes from '../NavRes';
-import NavBarDashboard from '../NavBarDashboard';
+
 
 
 
@@ -29,7 +28,7 @@ const Profile = () => {
   const [isEditProfileVisible, setEditProfileVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { profile, setProfile, toggleState  } = useContext(GlobalContext);
+  const { profile, setProfile,  upDatePage, handleToggleState  } = useContext(GlobalContext);
   const { token } = useAuth(); // Get token from useAuth
 
   const fetchProfile = async () => {
@@ -139,9 +138,35 @@ const Profile = () => {
   return (
     <section className="h-fit  dark:bg-gray-900 pb-8">
    
-      <header className="flex mt-4 justify-between px-4 mb-8">
-        <h1 className="text-2xl font-medium">My Profile </h1>
-      </header>
+     <header className="flex justify-between mb-6">
+                    <div className="flex flex-col w-full lg:flex-row justify-start items-start lg:items-center gap-4 lg:gap-0 lg:justify-between">
+                        <div className="flex flex-col gap-4">
+                            <h1 className="text-[32px] font-medium">My Profile</h1>
+                        
+                        </div>
+                        <div className="flex justify-center gap-4">
+                            <img
+                                onClick={() => upDatePage("Message")}
+                                src="/image/messageIcon.png"
+                                className="md:w-12 h-9 md:h-12 cursor-pointer"
+                                alt="Message Icon"
+                                loading="lazy"
+                            />
+                            <img
+                                onClick={() => upDatePage("Setting")}
+                                src="/image/settingIcon.png"
+                                className="md:w-12 h-9 md:h-12 cursor-pointer"
+                                alt="Setting Icon"
+                                loading="lazy"
+                            />
+                        </div>
+                    </div>
+                    <div onClick={handleToggleState} className="block lg:hidden mt-3">
+                        <button aria-label="Toggle menu">
+                            <FontAwesomeIcon icon={faBars} />
+                        </button>
+                    </div>
+                </header>
       <div className="container mx-auto px-4 max-w-6xl">
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
