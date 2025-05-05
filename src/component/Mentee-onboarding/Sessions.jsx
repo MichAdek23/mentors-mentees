@@ -5,7 +5,7 @@ import { faBars } from '@fortawesome/free-solid-svg-icons';
 import { useContext } from 'react';
 import { GlobalContext } from '@/component/GlobalStore/GlobalState';
 import { sessionApi } from '@/lib/api';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom'; // Keep Link
 import { useAuth } from '@/lib/AuthContext'; // Import useAuth
 
 const Sessions = () => {
@@ -58,10 +58,7 @@ const Sessions = () => {
     }
   };
 
-  const joinJitsiMeeting = (roomId) => {
-    // Open Jitsi Meet in a new window
-    window.open(`https://meet.jit.si/${roomId}`, '_blank');
-  };
+  // Removed joinJitsiMeeting function
 
   if (loading) return <div className="flex justify-center items-center h-full">Loading...</div>;
   if (error) return <div className="text-red-500 text-center">{error}</div>;
@@ -153,13 +150,13 @@ const Sessions = () => {
 
               <div className="mt-4 flex flex-wrap gap-4">
                 {session.status === 'accepted' && (
-                  <button
-                    onClick={() => joinJitsiMeeting(session.jitsiRoomId)}
+                  <Link
+                    to={`/jitsi/${session.jitsiRoomId}`}
                     className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
                   >
                     <Video className="w-4 h-4" />
                     Join Meeting
-                  </button>
+                  </Link>
                 )}
 
                 {activeTab === 'pending' && session.status === 'pending' && (

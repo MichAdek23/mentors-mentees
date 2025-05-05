@@ -26,6 +26,7 @@ import Requests from './component/MeentoDashboard/MentorPages/Requests';
 import PublicProfile from './component/MeentoDashboard/MentorPages/PublicProfile';
 import Booking from './component/MeentoDashboard/MentorPages/Booking';
 import DashboardLayout from './component/MeentoDashboard/DashboardLayout'; // Import the layout component
+import JitsiMeeting from './component/JitsiMeeting'; // Import JitsiMeeting component
 
 function App() {
   return (
@@ -48,6 +49,16 @@ function App() {
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/verify-email" element={<EmailVerification />} />
           <Route path="/verify-email/:token" element={<EmailVerification />} />
+
+          {/* Jitsi Meeting Route */}
+          <Route
+            path="/jitsi/:roomId"
+            element={
+              <PrivateRoute>
+                <JitsiMeeting />
+              </PrivateRoute>
+            }
+          />
 
           {/* Mentor Dashboard Routes */}
           <Route
@@ -144,4 +155,3 @@ function App() {
 }
 
 export default App;
-
