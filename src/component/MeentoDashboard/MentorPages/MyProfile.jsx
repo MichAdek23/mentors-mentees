@@ -8,6 +8,10 @@ import EditProfile from './EditProfile';
 import { useContext } from 'react';
 import { GlobalContext } from '@/component/GlobalStore/GlobalState';
 import { useAuth } from '@/lib/AuthContext'; // Import useAuth
+import NavRes from '../NavRes';
+import NavBarDashboard from '../NavBarDashboard';
+
+
 
 // Add icons to the library
 library.add(faBars, faRemove, faTwitter, faFacebook, faWhatsapp, faInstagram, faLinkedin);
@@ -139,7 +143,7 @@ const Profile = () => {
                 <NavRes/>
             </div>
             <section className='hidden lg:block h-screen w-[18%]'>
-                <NavBarDashboard/>
+             <NavBarDashboard/>
             </section>
       <header className="flex mt-4 justify-between px-4 mb-8">
         <h1 className="text-2xl font-medium">My Profile </h1>
