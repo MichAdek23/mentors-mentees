@@ -8,7 +8,7 @@ import { GlobalContext } from "@/component/GlobalStore/GlobalState";
 const PublicProfile = () => {
   const { userId } = useParams(); // Get the user ID from the URL
   const navigate = useNavigate(); // For navigation
-  const { upDatePage, handleToggleState, setSelectedUserForSession } = useContext(GlobalContext); // Global context for layout
+  const {  setSelectedUserForSession } = useContext(GlobalContext); // Global context for layout
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
