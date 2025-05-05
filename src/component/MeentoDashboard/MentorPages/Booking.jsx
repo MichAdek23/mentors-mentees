@@ -548,7 +548,7 @@ function Booking() {
       </header>
 
       <main className="mt-14">
-        <div className="p-2 bg-white w-fit flex items-center gap-2 rounded-md cursor-pointer shadow-sm">
+        <div className="p-2 bg-white w-[300px]  md:w-fit flex flex-wrap items-center gap-2 rounded-md cursor-pointer shadow-sm">
           <button
             onClick={changeStateToPending}
             className={`h-10 w-28 rounded-md text-black font-semibold transition-colors duration-300 ${
