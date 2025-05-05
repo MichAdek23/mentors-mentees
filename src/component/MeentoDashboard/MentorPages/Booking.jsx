@@ -1,11 +1,12 @@
 import { GlobalContext } from '@/component/GlobalStore/GlobalState';
 import React, { useContext, useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faPlus, faVideo, faClock, faCalendar, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faBars, } from '@fortawesome/free-solid-svg-icons';
 import Pending from './messageComponemts/Pending';
 import Histroy from './messageComponemts/histroy';
 import SessionNotification from './messageComponemts/SessionNotification';
 import { sessionApi, userApi } from '@/lib/api';
+import { useNavigate } from 'react-router-dom';
 
 function Booking() {
   const { upDatePage, handleToggleState, userRole, selectedUserForSession } = useContext(GlobalContext); // Add selectedUserForSession
@@ -27,7 +28,7 @@ function Booking() {
     notes: ''
   });
   const [connectionRequests, setConnectionRequests] = useState([]); // Add state for connection requests
-
+ const navigate = useNavigate(); // For navigation
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
