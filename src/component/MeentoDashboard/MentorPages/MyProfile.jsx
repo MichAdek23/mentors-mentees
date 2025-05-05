@@ -138,7 +138,7 @@ const Profile = () => {
 
   return (
     <section className="h-fit  dark:bg-gray-900 pb-8">
-    
+   
       <header className="flex mt-4 justify-between px-4 mb-8">
         <h1 className="text-2xl font-medium">My Profile </h1>
       </header>
@@ -213,7 +213,7 @@ const Profile = () => {
         </div>
       )}
       </section>
-      </section>
+      
    
     
     
