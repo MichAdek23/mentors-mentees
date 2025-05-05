@@ -348,6 +348,8 @@ function Booking() {
                         >
                           Reject
                         </button>
+
+                        <p className='text-lg  text-gray-600'> Check your email for the video call link</p>
                       </div>
                     </li>
                   ))}

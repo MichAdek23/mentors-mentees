@@ -27,7 +27,7 @@ function MentorDashBoard() {
     const { ActiveComponent, toggleState } = context;
 
     return (
-         <main className='flex bg-red-600 sidebar h-full'>
+         <main className='flex bg-white sidebar h-full'>
             <div className={`${toggleState ? 'translate-x-0' : 'translate-x-full'} transition-transform duration-300 fixed h-screen z-50 top-0 bg-white w-full`}>
                 <NavRes/>
             </div>
