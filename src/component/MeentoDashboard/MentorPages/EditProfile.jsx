@@ -157,15 +157,15 @@ const EditProfile = ({ profile, onUpdate, setIsEditProfileVisible }) => {
       />
 
       <div className="grid md:grid-cols-2 gap-4">
-        <input name="preferredIndustry" value={updatedProfile.preferredIndustry} onChange={handleChange} placeholder="Preferred Industry" className="p-2 border rounded" />
-        <input name="preferredSkills" value={updatedProfile.preferredSkills} onChange={handleChange} placeholder="Preferred Skills" className="p-2 border rounded" />
+        <input name="preferredIndustry" value={updatedProfile.preferredIndustry} onChange={handleChange} placeholder="Preferred Industry" className="p-2 my-3 border rounded" />
+        <input name="preferredSkills" value={updatedProfile.preferredSkills} onChange={handleChange} placeholder="Preferred Skills" className="p-2 my-3 border rounded" />
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
-        <input name="social.linkedIn" value={updatedProfile.social.linkedIn} onChange={handleChange} placeholder="LinkedIn URL" className="p-2 border rounded" />
-        <input name="social.twitter" value={updatedProfile.social.twitter} onChange={handleChange} placeholder="Twitter URL" className="p-2 border rounded" />
-        <input name="social.instagram" value={updatedProfile.social.instagram} onChange={handleChange} placeholder="Instagram URL" className="p-2 border rounded" />
-        <input name="social.website" value={updatedProfile.social.website} onChange={handleChange} placeholder="Personal Website" className="p-2 border rounded" />
+        <input name="social.linkedIn" value={updatedProfile.social.linkedIn} onChange={handleChange} placeholder="LinkedIn URL" className="p-2 my-3 border rounded" />
+        <input name="social.twitter" value={updatedProfile.social.twitter} onChange={handleChange} placeholder="Twitter URL" className="p-2 my-3 border rounded" />
+        <input name="social.instagram" value={updatedProfile.social.instagram} onChange={handleChange} placeholder="Instagram URL" className="p-2 my-3 border rounded" />
+        <input name="social.website" value={updatedProfile.social.website} onChange={handleChange} placeholder="Personal Website" className="p-2 my-3 border rounded" />
       </div>
 
       <button type="submit" disabled={loading} className="px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-700">
