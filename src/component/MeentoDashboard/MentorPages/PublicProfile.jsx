@@ -120,137 +120,141 @@ const PublicProfile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 flex flex-col items-center">
-      {/* Header */}
-      <header className="flex items-center justify-between w-full max-w-6xl mb-8">
-        <button
-          onClick={() => navigate(-1)} // Go back to the previous page
-          className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white"
-        >
-          <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
-          Back
-        </button>
-        <h1 className="text-[32px] font-medium text-gray-900 dark:text-white">
-          Public Profile
-        </h1>
-      </header>
-
-      {/* Profile Card */}
-      <div className="w-full max-w-6xl bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex flex-col md:flex-row">
-        {/* Left Section: Image and Interests */}
-        <div className="w-full md:w-1/3 bg-gray-100 dark:bg-gray-700 p-6 flex flex-col items-center">
-          <img
-            src={
-              user.profilePicture?.startsWith("http")
-                ? user.profilePicture
-                : `${import.meta.env.VITE_BACKEND_URL}${user.profilePicture || "/uploads/profiles/default-profile.png"}`
-            }
-            alt={`${user.firstName} ${user.lastName}`}
-            className="w-full h-48 object-cover border-4 border-white shadow-md mb-4"
-            onError={(e) => {
-              e.currentTarget.src = `${import.meta.env.VITE_BACKEND_URL}/uploads/profiles/default-profile.png`;
-            }}
-          />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            Interests
-          </h3>
-          <div className="flex flex-wrap gap-2 justify-center">
-            {user.interests?.length > 0 ? (
-              user.interests.map((interest, index) => (
-                <span
-                  key={index}
-                  className="px-3 py-1 bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-300 text-xs rounded-full"
-                >
-                  {interest}
-                </span>
-              ))
-            ) : (
-              <p className="text-sm text-gray-600 dark:text-gray-400">No interests available</p>
-            )}
-          </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 py-6 flex flex-col items-center">
+    {/* Header */}
+    <header className="flex flex-col sm:flex-row sm:items-center justify-between w-full max-w-6xl mb-6 gap-4 sm:gap-0">
+      <button
+        onClick={() => navigate(-1)}
+        className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white text-sm sm:text-base"
+      >
+        <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
+        Back
+      </button>
+      <h1 className="text-2xl sm:text-[30px] font-medium text-gray-900 dark:text-white text-center sm:text-left">
+        Public Profile
+      </h1>
+    </header>
+  
+    {/* Profile Card */}
+    <div className="w-full max-w-6xl bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex flex-col md:flex-row">
+      {/* Left Section: Image and Interests */}
+      <div className="w-full md:w-1/3 bg-gray-100 dark:bg-gray-700 p-6 flex flex-col items-center">
+        <img
+          src={
+            user.profilePicture?.startsWith("http")
+              ? user.profilePicture
+              : `${import.meta.env.VITE_BACKEND_URL}${user.profilePicture || "/uploads/profiles/default-profile.png"}`
+          }
+          alt={`${user.firstName} ${user.lastName}`}
+          className="w-32 h-32 sm:w-40 sm:h-40 md:w-full md:h-48 object-cover border-4 border-white shadow-md mb-4 rounded"
+          onError={(e) => {
+            e.currentTarget.src = `${import.meta.env.VITE_BACKEND_URL}/uploads/profiles/default-profile.png`;
+          }}
+        />
+  
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          Interests
+        </h3>
+  
+        <div className="flex flex-wrap gap-2 justify-center">
+          {user.interests?.length > 0 ? (
+            user.interests.map((interest, index) => (
+              <span
+                key={index}
+                className="px-3 py-1 bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-300 text-xs rounded-full"
+              >
+                {interest}
+              </span>
+            ))
+          ) : (
+            <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
+              No interests available
+            </p>
+          )}
         </div>
-
-        {/* Right Section: Details */}
-        <div className="w-full md:w-2/3 p-6">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            {`${user.firstName} ${user.lastName}`}
-          </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6 flex items-center gap-2">
-            <FontAwesomeIcon icon={faEnvelope} />
-            {user.email}
-          </p>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-            Role
-          </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-            {user.role}
-          </p>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-            Bio
-          </h3>
+      </div>
+  
+      {/* Right Section: Details */}
+      <div className="w-full md:w-2/3 p-6">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 text-center md:text-left">
+          {`${user.firstName} ${user.lastName}`}
+        </h2>
+  
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 flex items-center gap-2 justify-center md:justify-start">
+          <FontAwesomeIcon icon={faEnvelope} />
+          {user.email}
+        </p>
+  
+        <div className="mb-4">
+          <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">Role</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{user.role}</p>
+        </div>
+  
+        <div className="mb-4">
+          <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">Bio</h3>
           <p
-            className="text-sm text-gray-600 dark:text-gray-400 mb-6"
-            style={{ whiteSpace: "pre-wrap" }} // Ensure line breaks are observed
+            className="text-sm text-gray-600 dark:text-gray-400"
+            style={{ whiteSpace: "pre-wrap" }}
           >
             {user.bio || "No bio available"}
           </p>
-
-          {/* LinkedIn Link */}
-          {user.linkedin && (
-            <div className="mb-6">
-              <a
-                href={user.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-2"
-              >
-                <FontAwesomeIcon icon={faLinkedin} />
-                LinkedIn Profile
-              </a>
-            </div>
-          )}
-
-          {/* Connection Button */}
-          <div className="mt-6">
-            {connectionStatus === "accepted" ? (
-              <div className="flex flex-col gap-4">
-                <button
-                  onClick={() => {
-                    setSelectedUserForSession(user._id); // Set the selected user for session creation
-                    navigate("/mentor-dashboard/booking"); // Navigate to the Booking page (ensure this route matches your App.jsx)
-                  }}
-                  className="w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition-colors"
-                >
-                  Create Session
-                </button>
-                <button
-                  onClick={() => {
-                    navigate(`/mentor-dashboard/messages?userId=${user._id}`); // Redirect to Messages with the user chat open
-                  }}
-                  className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-colors"
-                >
-                  Chat
-                </button>
-              </div>
-            ) : connectionStatus === "pending" ? (
+        </div>
+  
+        {/* LinkedIn */}
+        {user.linkedin && (
+          <div className="mb-6">
+            <a
+              href={user.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-2 justify-center md:justify-start"
+            >
+              <FontAwesomeIcon icon={faLinkedin} />
+              LinkedIn Profile
+            </a>
+          </div>
+        )}
+  
+        {/* Buttons */}
+        <div className="mt-6 space-y-4">
+          {connectionStatus === "accepted" ? (
+            <>
               <button
-                disabled
-                className="w-full bg-gray-400 text-white py-2 rounded-lg cursor-not-allowed"
-              >
-                Request Pending
-              </button>
-            ) : (
-              <button
-                onClick={handleConnect}
+                onClick={() => {
+                  setSelectedUserForSession(user._id);
+                  navigate("/mentor-dashboard/booking");
+                }}
                 className="w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition-colors"
               >
-                Connect
+                Create Session
               </button>
-            )}
-          </div>
+              <button
+                onClick={() => navigate(`/mentor-dashboard/messages?userId=${user._id}`)}
+                className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                Chat
+              </button>
+            </>
+          ) : connectionStatus === "pending" ? (
+            <button
+              disabled
+              className="w-full bg-gray-400 text-white py-2 rounded-lg cursor-not-allowed"
+            >
+              Request Pending
+            </button>
+          ) : (
+            <button
+              onClick={handleConnect}
+              className="w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition-colors"
+            >
+              Connect
+            </button>
+          )}
         </div>
       </div>
     </div>
+  </div>
+  
   );
 };
 

@@ -248,7 +248,7 @@ function Explore() {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <button
                       onClick={() => handleViewProfile(user._id)} // Pass user._id to navigate
                       className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-colors"
