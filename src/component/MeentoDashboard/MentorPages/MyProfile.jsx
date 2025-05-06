@@ -185,7 +185,7 @@ const Profile = () => {
             <div className="h-48 rounded-t-xl bg-gradient-to-r from-blue-400 to-blue-600 relative">
               <div className="absolute -bottom-16 left-8 flex items-end">
                 <img
-                  src={getImageUrl(profile?.profilePicture)} 
+                  src={getImageUrl(profile?.profilePicture)}
                   alt={`${profile?.firstName || ''} ${profile?.lastName || ''}`}
                   className="w-32 h-32 rounded-full border-4 border-white dark:border-gray-800"
                   onError={handleImageError}
@@ -230,12 +230,19 @@ const Profile = () => {
       </div>
 
       {isEditProfileVisible && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 h-full overflow-y-scroll flex justify-center items-center z-50">
-          <div className="dark:bg-gray-800 bg-white p-2  w-[300px]  md:w-fit border rounded-2xl my-16 md:my-0 shadow-lg">
-            <button onClick={toggleEditProfile} className="bg-customOrange bg-opacity-50 h-6 w-6 rounded-full float-right">
-              <FontAwesomeIcon className='text-slate-50' icon={faRemove} />
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="dark:bg-gray-800 bg-white w-full max-w-md md:max-w-2xl h-[90vh] overflow-y-auto p-4 md:p-6 rounded-2xl shadow-lg relative">
+            <button
+              onClick={toggleEditProfile}
+              className="absolute top-3 right-3 bg-customOrange bg-opacity-50 h-6 w-6 rounded-full flex items-center justify-center"
+            >
+              <FontAwesomeIcon className="text-white text-xs" icon={faRemove} />
             </button>
-            <EditProfile profile={profile} onUpdate={handleProfileUpdate} setIsEditProfileVisible={setEditProfileVisible} />
+            <EditProfile
+              profile={profile}
+              onUpdate={handleProfileUpdate}
+              setIsEditProfileVisible={setEditProfileVisible}
+            />
           </div>
         </div>
       )}
