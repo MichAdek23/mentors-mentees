@@ -230,7 +230,7 @@ const Profile = () => {
       </div>
 
       {isEditProfileVisible && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center px-3 items-center z-50">
           <div className="dark:bg-gray-800 bg-white w-full max-w-md md:max-w-2xl h-[90vh] overflow-y-auto p-4 md:p-6 rounded-2xl shadow-lg relative">
             <button
               onClick={toggleEditProfile}
