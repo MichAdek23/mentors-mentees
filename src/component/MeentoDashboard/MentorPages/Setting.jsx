@@ -286,22 +286,22 @@ function Setting() {
                         </div>
                         <div className="mb-4">
                             <label className="block text-gray-700">Mentorship Status</label>
-                            <Select className="h-full rounded-xl p-2" onValueChange={(value) => handleSelectChange('mentorshipStatus', value)}>
+                            <Select className="h-full rounded-xl p-2 outline-none" onValueChange={(value) => handleSelectChange('mentorshipStatus', value)}>
                                 <SelectTrigger className="outline-none w-full border-2 rounded-xl h-[60px]">
                                     <SelectValue className="text-lg text-slate-500" placeholder="Select One" />
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent className="bg-white">
                                     <SelectItem value="Cordial/Friendly">Cordial/Friendly</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
                         <div className="mb-4">
                             <label className="block text-gray-700">Gender</label>
-                            <Select className="p-2" onValueChange={(value) => handleSelectChange('gender', value)}>
+                            <Select className="p-2 outline-none" onValueChange={(value) => handleSelectChange('gender', value)}>
                                 <SelectTrigger className="outline-none w-full border-2 rounded-xl h-[60px]">
                                     <SelectValue className="text-lg text-slate-500" placeholder="Select One" />
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent className="bg-white">
                                     <SelectItem value="Female">Female</SelectItem>
                                     <SelectItem value="Male">Male</SelectItem>
                                 </SelectContent>
@@ -309,11 +309,11 @@ function Setting() {
                         </div>
                         <div className="mb-4">
                             <label className="block text-gray-700">Mode of Contact</label>
-                            <Select className="h-full" onValueChange={(value) => handleSelectChange('modeOfContact', value)}>
+                            <Select className="h-full outline-none" onValueChange={(value) => handleSelectChange('modeOfContact', value)}>
                                 <SelectTrigger className="outline-none w-full border-2 rounded-xl h-[60px]">
                                     <SelectValue className="text-lg text-slate-500" placeholder="Select One" />
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent className="bg-white">
                                     <SelectItem value="Virtual">Virtual</SelectItem>
                                     <SelectItem value="Physical">Physical</SelectItem>
                                 </SelectContent>
@@ -321,11 +321,11 @@ function Setting() {
                         </div>
                         <div className="mb-4">
                             <label className="block text-gray-700">Availability</label>
-                            <Select className="h-full" onValueChange={(value) => handleSelectChange('availability', value)}>
+                            <Select className="h-full outline-none" onValueChange={(value) => handleSelectChange('availability', value)}>
                                 <SelectTrigger className="outline-none w-full border-2 rounded-xl h-[60px]">
                                     <SelectValue className="text-lg text-slate-500" placeholder="Select One" />
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent className="bg-white">
                                     <SelectItem value="Available ASAP">Available ASAP</SelectItem>
                                     <SelectItem value="In a few weeks">In a few weeks</SelectItem>
                                 </SelectContent>
