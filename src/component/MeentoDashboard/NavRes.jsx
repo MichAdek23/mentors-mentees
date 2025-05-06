@@ -1,16 +1,23 @@
 import React, { useContext } from 'react'
 import { GlobalContext } from '../GlobalStore/GlobalState';
 import { FontAwesomeIcon  } from '@fortawesome/react-fontawesome';
-import { faRemove } from '@fortawesome/free-solid-svg-icons';
+import { faRemove, faDeleteLeft } from '@fortawesome/free-solid-svg-icons';
+import { useAuth } from "../../lib/AuthContext";
+import { useNavigate } from 'react-router-dom';
 function NavRes() {
 
   const { upDatePage, activeComponent, handleToggleState } = useContext(GlobalContext)
 
-
+  const {  logout } = useAuth();
+  const navigate = useNavigate();
     
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
-    <section className=' z-50 h-full w-full pb-3  pt-10 '>
+    <section className=' z-50 h-full w-1/2 pb-3  flex flex-col justify-center items-center pt-10 '>
       <div className=' w-full flex justify-between px-3 items-center '>
       <div className="w-full flex justify-center items-center">
       <h1 className=' text-xl md:text-2xl font-bold text-orange-400  '>Leap Mentorship</h1>
@@ -49,6 +56,16 @@ function NavRes() {
           <div onClick={() => upDatePage('Setting')} className={`${activeComponent === 'Setting' ? 'text-customOrange' : 'text-gray-500'}  flex  gap-4  cursor-pointer font-medium items-center`}>
             <span><img src="/image/navBarSettingIcon.png" className=' h-7' alt="" /></span> Settings
           </div>
+
+            <div
+                      onClick={handleLogout}
+                      className="flex gap-4 font-medium cursor-pointer items-center text-gray-400 hover:text-red-500"
+                    >
+                      <span>
+                        <FontAwesomeIcon icon={faDeleteLeft} />
+                      </span>
+                      Log Out
+                    </div>
         </div>
       </div>
     </section>
