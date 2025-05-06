@@ -17,7 +17,7 @@ function NavRes() {
   };
 
   return (
-    <section className=' z-50 h-full w-1/2 pb-3  flex flex-col justify-center items-center pt-10 '>
+    <section className=' z-50 h-full w-full pb-3  flex flex-col justify-center items-center pt-10 '>
       <div className=' w-full flex justify-between px-3 items-center '>
       <div className="w-full flex justify-center items-center">
       <h1 className=' text-xl md:text-2xl font-bold text-orange-400  '>Leap Mentorship</h1>
