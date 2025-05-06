@@ -16,7 +16,7 @@ const Pending = ({ sessions, onJoinMeeting, onSessionUpdate }) => {
       setActionError(null);
 
       const response = await sessionApi.updateStatus(sessionId, action);
-      
+
       if (response.data) {
         if (onSessionUpdate) {
           onSessionUpdate();
@@ -45,14 +45,14 @@ const Pending = ({ sessions, onJoinMeeting, onSessionUpdate }) => {
           {actionError}
         </div>
       )}
-      
+
       {sessions.map((session) => {
         const sessionDate = new Date(session.date);
         const isMentor = user?.role === 'mentor';
         const isCreator = session.mentor?._id === user?.id;
         const otherParticipant = isMentor ? session.mentee : session.mentor;
         const isLoading = actionLoading === session._id;
-        
+
         return (
           <div
             key={session._id}
@@ -173,6 +173,10 @@ const Pending = ({ sessions, onJoinMeeting, onSessionUpdate }) => {
                   Mark as Completed
                 </button>
               )}
+
+              <p className="text-gray-600 text-md italic mt-2">
+                   Check your email for the conference call link.
+              </p>
             </div>
           </div>
         );

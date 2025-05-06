@@ -231,7 +231,12 @@ const Profile = () => {
 
       {isEditProfileVisible && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center px-3 items-center z-50">
-          <div className="dark:bg-gray-800 bg-white w-full max-w-md md:max-w-2xl h-[90vh] overflow-y-auto p-4 md:p-6 rounded-2xl shadow-lg relative">
+          <div className="dark:bg-gray-800 bg-white w-full max-w-md md:max-w-2xl h-[90vh] overflow-y-auto p-4 md:p-6 rounded-2xl shadow-lg relative"   
+          style={{
+          overflowY: 'auto',
+          scrollbarWidth: 'none', 
+          msOverflowStyle: 'none', 
+        }}>
             <button
               onClick={toggleEditProfile}
               className="absolute top-3 right-3 bg-customOrange bg-opacity-50 h-6 w-6 rounded-full flex items-center justify-center"
