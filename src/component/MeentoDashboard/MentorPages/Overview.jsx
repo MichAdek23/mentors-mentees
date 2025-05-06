@@ -200,7 +200,7 @@ function Overview() {
             <h1 className="md:text-lg lg:text-2xl font-medium">Your profile strength</h1>
 
             <button 
-              onClick={() => upDatePage("profile")}
+              onClick={() => upDatePage("Profile")}
               className="h-[30px] w-[30px] flex justify-center items-center bg-slate-200 rounded-full hover:bg-slate-300 transition-colors"
             >
               <FontAwesomeIcon icon={faLongArrowRight} />
@@ -225,7 +225,7 @@ function Overview() {
               Complete your 1st Mentorship Sessions Milestone
             </h1>
 
-            <button className="h-[30px] w-[50px] flex justify-center items-center bg-slate-200 rounded-full">
+            <button  onClick={() => upDatePage("Booking")} className="h-[30px] w-[50px] flex justify-center items-center bg-slate-200 rounded-full">
               <FontAwesomeIcon icon={faLongArrowRight} />
             </button>
           </div>
