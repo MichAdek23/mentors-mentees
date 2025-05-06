@@ -124,7 +124,7 @@ const EditProfile = ({ profile, onUpdate, setIsEditProfileVisible }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className=" w-full  ">
+    <form onSubmit={handleSubmit} className=" w-full  px-3 ">
       <h2 className="text-2xl font-bold text-cyan-700">Edit Profile</h2>
       {error && <p className="text-red-600 font-medium">{error}</p>}
 
