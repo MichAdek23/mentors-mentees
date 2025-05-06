@@ -200,7 +200,7 @@ function Overview() {
             <h1 className="md:text-lg lg:text-2xl font-medium">Your profile strength</h1>
 
             <button 
-              onClick={() => upDatePage("MyProfile")}
+              onClick={() => upDatePage("profile")}
               className="h-[30px] w-[30px] flex justify-center items-center bg-slate-200 rounded-full hover:bg-slate-300 transition-colors"
             >
               <FontAwesomeIcon icon={faLongArrowRight} />
