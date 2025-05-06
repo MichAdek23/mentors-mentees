@@ -29,7 +29,7 @@ function MentorDashBoard() {
     return (
         <main className="flex h-full bg-white">
      
-        <div className={`lg:hidden fixed inset-0 z-50 bg-white transform transition-transform duration-300 ${toggleState ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div className={`lg:hidden fixed inset-0 z-50 w-[80%] bg-white transform transition-transform duration-300 ${toggleState ? 'translate-x-0' : 'translate-x-full'}`}>
           <NavRes />
         </div>
 
