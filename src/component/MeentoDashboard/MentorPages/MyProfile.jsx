@@ -231,7 +231,7 @@ const Profile = () => {
 
       {isEditProfileVisible && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="dark:bg-gray-800 bg-white p-2  w-[300px] md:w-fit border rounded-2xl shadow-lg">
+          <div className="dark:bg-gray-800 bg-white p-2  w-[300px]  md:w-fit border rounded-2xl space-y-4 shadow-lg">
             <button onClick={toggleEditProfile} className="bg-customOrange bg-opacity-50 h-6 w-6 rounded-full float-right">
               <FontAwesomeIcon className='text-slate-50' icon={faRemove} />
             </button>
