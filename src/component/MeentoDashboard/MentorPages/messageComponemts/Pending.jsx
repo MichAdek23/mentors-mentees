@@ -174,10 +174,11 @@ const Pending = ({ sessions, onJoinMeeting, onSessionUpdate }) => {
                 </button>
               )}
 
-              <p className="text-gray-600 text-md italic mt-2">
+             
+            </div>
+            <p className="text-gray-600 text-md italic mt-2">
                    Check your email for the conference call link.
               </p>
-            </div>
           </div>
         );
       })}
