@@ -275,14 +275,14 @@ function Overview() {
         </div>
 
         {/* Upcoming Sessions Section */}
-        <div className="bg-white p-5 shadow-2xl rounded-lg md:w-[40%] lg:w-[33%]">
+        {/* <div className="bg-white p-5 shadow-2xl rounded-lg md:w-[40%] lg:w-[33%]">
           <h2 className="text-lg font-medium mb-4">Upcoming Sessions</h2>
           <p className="text-gray-600">
             You have <strong>{upcomingSessionsCount}</strong> upcoming session
             {upcomingSessionsCount !== 1 ? "s" : ""}.
           </p>
         </div>
-      </section>
+      </section> */}
 
       {/* Statistics Section */}
       <section className="mt-9">
