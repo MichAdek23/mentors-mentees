@@ -31,7 +31,6 @@ const getImageUrl = (imagePath) => {
 function Overview() {
   const [stats, setStats] = useState(null);
   const [connections, setConnections] = useState([]);
-  const [upcomingSessionsCount, setUpcomingSessionsCount] = useState(0);
   const [userData, setUserData] = useState(null);
   const { user } = useAuth(); // Get user from useAuth
   const { upDatePage, handleToggleState, acceptedMentees } = useContext(GlobalContext);
@@ -281,8 +280,8 @@ function Overview() {
             You have <strong>{upcomingSessionsCount}</strong> upcoming session
             {upcomingSessionsCount !== 1 ? "s" : ""}.
           </p>
-        </div>
-      </section> */}
+        </div> */}
+      </section>
 
       {/* Statistics Section */}
       <section className="mt-9">
