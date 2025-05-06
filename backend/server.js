@@ -41,7 +41,8 @@ app.set('io', io);
 // Middleware
 const allowedOrigins = [
   'https://leap-on-ng.vercel.app',
-  'https://leap-on-ng.onrender.com'
+  'https://leap-on-ng.onrender.com',
+  'https://leapon.com.ng' 
 ];
 
 app.use(cors({
