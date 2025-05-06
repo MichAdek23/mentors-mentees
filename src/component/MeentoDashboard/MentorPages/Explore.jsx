@@ -142,7 +142,7 @@ function Explore() {
       <header className="flex justify-between mb-8">
         <div className="flex flex-col w-full lg:flex-row justify-start items-start lg:items-center gap-4 lg:gap-0 lg:justify-between">
           <div className="flex flex-col gap-4">
-            <h1 className="text-[32px] font-medium">
+            <h1 className="text-[16px] md:text-[32px] font-medium">
               Connect with Mentors and Mentees
             </h1>
             <p className="text-base font-medium text-slate-600">
