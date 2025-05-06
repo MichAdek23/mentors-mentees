@@ -130,7 +130,7 @@ const EditProfile = ({ profile, onUpdate, setIsEditProfileVisible }) => {
 
       <div>
         <p className='text-lg font-medium text-cyan-600'>Upload Profile Photo*</p>
-        <div className='flex gap-4 items-center mt-4'>
+        <div className='flex flex-col md:flex-row  gap-4 items-center mt-4'>
           <img
             src={getImageUrl(updatedProfile.profilePicture)}
             alt="Profile Preview"
