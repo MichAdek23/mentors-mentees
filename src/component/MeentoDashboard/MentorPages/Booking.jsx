@@ -5,15 +5,15 @@ import { faBars, } from '@fortawesome/free-solid-svg-icons';
 import Pending from './messageComponemts/Pending';
 import Histroy from './messageComponemts/histroy';
 import SessionNotification from './messageComponemts/SessionNotification';
-import { sessionApi, userApi } from '@/lib/api';
+import { sessionApi } from '@/lib/api'; // userApi import can be removed if not used elsewhere in this component after changes
 import { useNavigate } from 'react-router-dom';
 
 function Booking() {
-  const { upDatePage, handleToggleState, userRole, selectedUserForSession } = useContext(GlobalContext); // Add selectedUserForSession
+  const { upDatePage, handleToggleState, userRole, selectedUserForSession } = useContext(GlobalContext);
   const [components, setComponents] = useState('Pending');
   const [pendingSessions, setPendingSessions] = useState([]);
   const [historySessions, setHistorySessions] = useState([]);
-  const [mentors, setMentors] = useState([]);
+  const [mentors, setMentors] = useState([]); // This will store connected users for the 'Create' tab
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -27,8 +27,9 @@ function Booking() {
     description: '',
     notes: ''
   });
-  const [connectionRequests, setConnectionRequests] = useState([]); // Add state for connection requests
- const navigate = useNavigate(); // For navigation
+  const [connectionRequests, setConnectionRequests] = useState([]);
+  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -40,12 +41,8 @@ function Booking() {
         } else if (components === 'History') {
           const response = await sessionApi.getHistory();
           setHistorySessions(response.data);
-        } else if (components === 'Create') {
-          const response = userRole === 'mentor' 
-            ? await userApi.getMentees()
-            : await userApi.getMentors();
-          setMentors(response.data);
         }
+        // Logic for fetching mentors/mentees based on userRole for 'Create' tab removed
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to fetch data');
       } finally {
@@ -54,40 +51,44 @@ function Booking() {
     };
 
     fetchData();
-  }, [components, userRole]);
+  }, [components]); // userRole removed from dependency array
 
   useEffect(() => {
     const fetchConnectedUsers = async () => {
       setLoading(true);
       setError(null);
       try {
-        if (components === 'Create') {
-          const response = await fetch(`${import.meta.env.VITE_API_URL}/connections`, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          });
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/connections`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
 
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || "Failed to fetch connected users");
-          }
-
-          const data = await response.json();
-          setMentors(data.map((connection) => {
-            return connection.requester._id === localStorage.getItem("userId")
-              ? connection.recipient
-              : connection.requester;
-          }));
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to fetch connected users");
         }
+
+        const data = await response.json();
+        const currentUserId = localStorage.getItem("userId");
+        setMentors(data.map((connection) => {
+          return connection.requester._id === currentUserId
+            ? connection.recipient
+            : connection.requester;
+        }));
       } catch (err) {
         setError(err.message || "Failed to fetch connected users");
+        setMentors([]); // Clear mentors on error
       } finally {
         setLoading(false);
       }
     };
 
-    fetchConnectedUsers();
+    if (components === 'Create') {
+      fetchConnectedUsers();
+    } else {
+      setMentors([]); // Clear the list when not on the 'Create' tab
+    }
   }, [components]);
 
   useEffect(() => {
@@ -127,17 +128,17 @@ function Booking() {
     if (selectedUserForSession && components === "Create") {
       setFormData((prev) => ({
         ...prev,
-        mentor: selectedUserForSession, // Pre-fill the mentor field
+        mentor: selectedUserForSession, 
       }));
     }
   }, [selectedUserForSession, components]);
 
   useEffect(() => {
     if (selectedUserForSession) {
-      setComponents("Create"); // Automatically switch to the "Create" tab
+      setComponents("Create"); 
       setFormData((prev) => ({
         ...prev,
-        mentor: selectedUserForSession, // Pre-fill the mentor field with the selected user
+        mentor: selectedUserForSession, 
       }));
     }
   }, [selectedUserForSession]);
@@ -214,7 +215,7 @@ function Booking() {
 
   const validateForm = () => {
     if (!formData.mentor) {
-      setError('Please select a mentor');
+      setError('Please select a user to connect with');
       return false;
     }
     if (!formData.date || !formData.time) {
@@ -295,11 +296,11 @@ function Booking() {
   };
 
   const getCreateButtonText = () => {
-    return userRole === 'mentor' ? 'Connect with Mentee' : 'Create Session';
+    return userRole === 'mentor' ? 'Connect with User' : 'Create Session with User'; // Adjusted text for clarity
   };
 
   const displayComponent = () => {
-    if (loading) {
+    if (loading && components === 'Create') { // Show loading specifically for create tab if mentors list is loading
       return (
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
@@ -336,7 +337,7 @@ function Booking() {
                         {`${request.requester.firstName} ${request.requester.lastName}`} wants to connect with you.
                       </p>
                       <p className="text-sm text-gray-600">{request.requester.email}</p>
-                      <div className="mt-4 flex gap-4">
+                      <div className="mt-4 flex gap-4 items-center">
                         <button
                           onClick={() => handleAcceptRequest(request._id)}
                           className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
@@ -349,8 +350,7 @@ function Booking() {
                         >
                           Reject
                         </button>
-
-                        <p className='text-lg  text-gray-600'> Check your email for the video call link</p>
+                        <p className='text-sm text-gray-500'> Check your email for the video call link</p>
                       </div>
                     </li>
                   ))}
@@ -366,19 +366,22 @@ function Booking() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Select a User to Connect With
+                Select a User to Create Session With
               </label>
               <select
-                name="mentor"
+                name="mentor" // This name implies the selected user is a mentor, which might be confusing but is tied to formData
                 value={formData.mentor}
                 onChange={handleChange}
                 required
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
               >
-                <option value="">Choose a user to connect with</option>
-                {mentors.map(mentee => (
-                  <option key={mentee._id} value={mentee._id}>
-                    {`${mentee.firstName} ${mentee.lastName}`} {/* Display full name */}
+                <option value="">Choose a connected user</option>
+                {mentors.length === 0 && !loading && (
+                  <option value="" disabled>No connected users found.</option>
+                )}
+                {mentors.map(user => (
+                  <option key={user._id} value={user._id}>
+                    {`${user.firstName} ${user.lastName}`}
                   </option>
                 ))}
               </select>
@@ -502,7 +505,7 @@ function Booking() {
                     {userRole === 'mentor' ? 'Connecting...' : 'Creating Session...'}
                   </>
                 ) : (
-                  userRole === 'mentor' ? 'Connect with Mentee' : 'Schedule Session'
+                  getCreateButtonText() // Use the updated button text
                 )}
               </button>
             </div>
