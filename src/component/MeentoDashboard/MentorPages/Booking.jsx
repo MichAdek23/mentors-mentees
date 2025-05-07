@@ -5,20 +5,20 @@ import { faBars, } from '@fortawesome/free-solid-svg-icons';
 import Pending from './messageComponemts/Pending';
 import Histroy from './messageComponemts/histroy';
 import SessionNotification from './messageComponemts/SessionNotification';
-import { sessionApi } from '@/lib/api'; // userApi import can be removed if not used elsewhere in this component after changes
+import { sessionApi } from '@/lib/api'; 
 import { useNavigate } from 'react-router-dom';
 
 function Booking() {
-  const { upDatePage, handleToggleState, userRole, selectedUserForSession } = useContext(GlobalContext);
+  const { upDatePage, handleToggleState, userRole, selectedUserForSession, user } = useContext(GlobalContext); 
   const [components, setComponents] = useState('Pending');
   const [pendingSessions, setPendingSessions] = useState([]);
   const [historySessions, setHistorySessions] = useState([]);
-  const [mentors, setMentors] = useState([]); // This will store connected users for the 'Create' tab
+  const [mentors, setMentors] = useState([]); 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    mentor: '',
+    mentor: '', 
     date: '',
     time: '',
     duration: 60,
@@ -29,6 +29,7 @@ function Booking() {
   });
   const [connectionRequests, setConnectionRequests] = useState([]);
   const navigate = useNavigate();
+   const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,16 +43,14 @@ function Booking() {
           const response = await sessionApi.getHistory();
           setHistorySessions(response.data);
         }
-        // Logic for fetching mentors/mentees based on userRole for 'Create' tab removed
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to fetch data');
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
-  }, [components]); // userRole removed from dependency array
+  }, [components]);
 
   useEffect(() => {
     const fetchConnectedUsers = async () => {
@@ -63,12 +62,10 @@ function Booking() {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
-
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.message || "Failed to fetch connected users");
         }
-
         const data = await response.json();
         const currentUserId = localStorage.getItem("userId");
         setMentors(data.map((connection) => {
@@ -78,16 +75,15 @@ function Booking() {
         }));
       } catch (err) {
         setError(err.message || "Failed to fetch connected users");
-        setMentors([]); // Clear mentors on error
+        setMentors([]);
       } finally {
         setLoading(false);
       }
     };
-
     if (components === 'Create') {
       fetchConnectedUsers();
     } else {
-      setMentors([]); // Clear the list when not on the 'Create' tab
+      setMentors([]); 
     }
   }, [components]);
 
@@ -105,7 +101,6 @@ function Booking() {
               },
             }
           );
-
           if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.message || "Failed to fetch connection requests");
@@ -120,7 +115,6 @@ function Booking() {
         setLoading(false);
       }
     };
-
     fetchConnectionRequests();
   }, [components]);
 
@@ -154,14 +148,15 @@ function Booking() {
           },
         }
       );
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to accept request");
       }
 
-      alert("Request accepted successfully!");
       setConnectionRequests((prev) => prev.filter((req) => req._id !== requestId));
+      // TODO: Trigger in-app notification for request acceptance for both users
+      // TODO: Consider triggering a push notification to the request initiator
+
     } catch (err) {
       console.error("Error accepting request:", err);
       setError(err.message || "Failed to accept request. Please try again.");
@@ -179,31 +174,22 @@ function Booking() {
           },
         }
       );
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to reject request");
       }
-
-      alert("Request rejected successfully!");
       setConnectionRequests((prev) => prev.filter((req) => req._id !== requestId));
+       // TODO: Trigger in-app notification for request rejection for both users
+
     } catch (err) {
       console.error("Error rejecting request:", err);
       setError(err.message || "Failed to reject request. Please try again.");
     }
   };
 
-  const changeStateToPending = () => {
-    setComponents('Pending');
-  };
-
-  const changeStateToHistory = () => {
-    setComponents('History');
-  };
-
-  const changeStateToCreate = () => {
-    setComponents('Create');
-  };
+  const changeStateToPending = () => setComponents('Pending');
+  const changeStateToHistory = () => setComponents('History');
+  const changeStateToCreate = () => setComponents('Create');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -242,6 +228,7 @@ function Booking() {
 
     setSubmitting(true);
     setError(null);
+    setSuccessMessage(''); // Clear any previous success message
 
     try {
       const token = localStorage.getItem("token");
@@ -252,8 +239,10 @@ function Booking() {
       }
 
       const dateTime = new Date(`${formData.date}T${formData.time}`);
-      const sessionData = {
+      const sessionDataToCreate = {
         ...formData,
+         mentee: user?._id, // Assuming the logged-in user is the mentee creating the session
+         mentor: formData.mentor, // This is the ID of the selected user (recipient)
         date: dateTime.toISOString(),
         duration: parseInt(formData.duration),
       };
@@ -264,7 +253,7 @@ function Booking() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(sessionData),
+        body: JSON.stringify(sessionDataToCreate),
       });
 
       if (!response.ok) {
@@ -272,17 +261,36 @@ function Booking() {
         throw new Error(errorData.message || "Failed to create session");
       }
 
-      alert("Session created successfully!");
+      const createdSession = await response.json(); 
+       setSuccessMessage("Session created successfully! Waiting for recipient's confirmation."); // Set success message
+
+      // Placeholder for sending a push notification to the recipient via backend
+      if (createdSession && createdSession.session && createdSession.session._id && formData.mentor) {
+        try {
+          const notifyResponse = await fetch(`${import.meta.env.VITE_API_URL}/notifications/send-session-request`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              recipientId: formData.mentor, 
+              sessionId: createdSession.session._id,
+              message: `You have a new session request for "${formData.topic}" from ${user?.firstName || 'a user'}.`,
+            }),
+          });
+          if (!notifyResponse.ok) {
+            console.error("Failed to send push notification request to backend");
+          }
+        } catch (notifyError) {
+          console.error("Error trying to send push notification request:", notifyError);
+        }
+      }
+
       setComponents("Pending");
       setFormData({
-        mentor: "",
-        date: "",
-        time: "",
-        duration: 60,
-        topic: "",
-        type: "one-on-one",
-        description: "",
-        notes: "",
+        mentor: "", date: "", time: "", duration: 60, topic: "",
+        type: "one-on-one", description: "", notes: "",
       });
     } catch (err) {
       setError(err.message || "Failed to create session. Please try again.");
@@ -296,18 +304,17 @@ function Booking() {
   };
 
   const getCreateButtonText = () => {
-    return userRole === 'mentor' ? 'Connect with User' : 'Create Session with User'; // Adjusted text for clarity
+    return userRole === 'mentor' ? 'Connect with User' : 'Create Session with User';
   };
 
   const displayComponent = () => {
-    if (loading && components === 'Create') { // Show loading specifically for create tab if mentors list is loading
+    if (loading && components === 'Create') {
       return (
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
         </div>
       );
     }
-
     if (error) {
       return (
         <div className="text-red-500 text-center py-4 bg-red-50 rounded-lg">
@@ -315,7 +322,6 @@ function Booking() {
         </div>
       );
     }
-
     switch (components) {
       case 'Pending':
         return (
@@ -350,7 +356,7 @@ function Booking() {
                         >
                           Reject
                         </button>
-                        <p className='text-sm text-gray-500'> Check your email for the video call link</p>
+                         {/* Removed the unnecessary text here */}
                       </div>
                     </li>
                   ))}
@@ -364,12 +370,17 @@ function Booking() {
       case 'Create':
         return (
           <form onSubmit={handleSubmit} className="space-y-6">
+           {successMessage && (
+                <div className="text-green-500 text-center py-2 bg-green-50 rounded-lg">
+                  {successMessage}
+                </div>
+              )}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Select a User to Create Session With
               </label>
               <select
-                name="mentor" // This name implies the selected user is a mentor, which might be confusing but is tied to formData
+                name="mentor"
                 value={formData.mentor}
                 onChange={handleChange}
                 required
@@ -505,7 +516,7 @@ function Booking() {
                     {userRole === 'mentor' ? 'Connecting...' : 'Creating Session...'}
                   </>
                 ) : (
-                  getCreateButtonText() // Use the updated button text
+                  getCreateButtonText()
                 )}
               </button>
             </div>
@@ -525,7 +536,6 @@ function Booking() {
             <h1 className="text-[32px] font-medium">Bookings</h1>
             <p className="text-base font-medium text-slate-600">Manage your mentoring sessions</p>
           </div>
-
           <div className="flex items-center gap-4">
             <img
               onClick={() => upDatePage('Message')}
@@ -544,9 +554,7 @@ function Booking() {
           </div>
         </div>
         <div onClick={handleToggleState} className="block lg:hidden mt-3">
-          <button>
-            <FontAwesomeIcon icon={faBars} />
-          </button>
+          <button><FontAwesomeIcon icon={faBars} /></button>
         </div>
       </header>
 
