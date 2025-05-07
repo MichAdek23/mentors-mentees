@@ -42,11 +42,20 @@ app.set('io', io);
 const allowedOrigins = [
   'https://leap-on-ng.vercel.app',
   'https://leap-on-ng.onrender.com',
-  'https://leapon.com.ng' 
+  'https://leapon.com.ng'
 ];
 
+// Updated CORS configuration to allow multiple origins
 app.use(cors({
-  origin: process.env.FRONTEND_URL, // Allow requests from the frontend URL
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    // and requests from the allowed origins list
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true, // Allow cookies and credentials
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed HTTP methods
   allowedHeaders: ['Authorization', 'Content-Type']
