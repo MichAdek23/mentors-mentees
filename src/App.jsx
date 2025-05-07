@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './lib/AuthContext';
 import Login from './component/UserAuth/Login/Login';
@@ -27,8 +27,25 @@ import PublicProfile from './component/MeentoDashboard/MentorPages/PublicProfile
 import Booking from './component/MeentoDashboard/MentorPages/Booking';
 import DashboardLayout from './component/MeentoDashboard/DashboardLayout'; // Import the layout component
 import JitsiMeeting from './component/JitsiMeeting'; // Import JitsiMeeting component
+import NotFound from './components/NotFound'; // Import the NotFound component
+import Preloader from './components/Preloader'; // Import the Preloader component
 
 function App() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Hide the preloader after a fixed duration
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000); // Show preloader for 2 seconds. Adjust this duration as needed.
+
+    return () => clearTimeout(timer); // Clean up the timer on component unmount
+  }, []); // Empty dependency array ensures this effect runs only once on mount
+
+  if (loading) {
+    return <Preloader />;
+  }
+
   return (
     <Router>
       <AuthProvider>
@@ -148,6 +165,9 @@ function App() {
               </PrivateRoute>
             }
           />
+
+          {/* 404 Not Found route */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </AuthProvider>
     </Router>
