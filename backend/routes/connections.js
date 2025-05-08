@@ -166,53 +166,59 @@ router.put('/:connectionId/reject', auth, async (req, res) => {
 });
 
 // @route   GET api/connections
-// @desc    Get all connections for the current user and return connected users
+// @desc    Get all accepted connections for the current user and return connected users
 // @access  Private
 router.get('/', auth, async (req, res) => {
   try {
+    // Find connections where the current user is either the requester or the recipient AND the status is accepted
     const connections = await Connection.find({
       $or: [{ requester: req.user.id }, { recipient: req.user.id }],
-      status: 'accepted' // Only fetch accepted connections
+      status: 'accepted' 
     })
-      .populate('requester', 'firstName lastName email role profileImage') // Populate with necessary user fields
-      .populate('recipient', 'firstName lastName email role profileImage'); // Populate with necessary user fields
+      // Populate both requester and recipient with necessary user fields
+      .populate('requester', 'firstName lastName email role profileImage') 
+      .populate('recipient', 'firstName lastName email role profileImage'); 
 
     const connectedUsers = [];
-    const connectedUserIds = new Set(); // Use a Set to track unique user IDs
+    const connectedUserIds = new Set(); // Use a Set to track unique user IDs to avoid duplicates
 
     connections.forEach(connection => {
+      // Determine which user in the connection is the 'other' user (not the current user)
       const otherUser = connection.requester._id.toString() === req.user.id.toString()
         ? connection.recipient
         : connection.requester;
 
-      // Add the other user if their ID hasn't been added yet
-      if (!connectedUserIds.has(otherUser._id.toString())) {
+      // Check if otherUser is valid and hasn't been added yet
+      if (otherUser && otherUser._id && !connectedUserIds.has(otherUser._id.toString())) {
         connectedUsers.push(otherUser);
         connectedUserIds.add(otherUser._id.toString());
       }
     });
 
+    // Respond with the array of unique connected user objects
     res.json(connectedUsers);
   } catch (err) {
-    console.error('Error fetching connected users:', err.message); // More specific logging
+    console.error('Error fetching connected users:', err.message); 
     res.status(500).send('Server Error');
   }
 });
 
 // @route   GET api/connections/pending
-// @desc    Get pending connection requests for the current user
+// @desc    Get pending connection requests for the current user (where current user is the recipient)
 // @access  Private
 router.get('/pending', auth, async (req, res) => {
   try {
+    // Find pending connections where the current user is the recipient
     const pendingConnections = await Connection.find({
       recipient: req.user.id,
       status: 'pending',
     })
-      .populate('requester', 'firstName lastName email role interests profileImage'); // Populate with necessary user fields
+      // Populate the requester (the user who sent the request)
+      .populate('requester', 'firstName lastName email role interests profileImage'); 
 
     res.json(pendingConnections);
   } catch (err) {
-    console.error('Error fetching pending connection requests:', err.message); // More specific logging
+    console.error('Error fetching pending connection requests:', err.message); 
     res.status(500).send('Server Error');
   }
 });
@@ -229,7 +235,7 @@ router.get('/status/:userId', auth, async (req, res) => {
       return res.status(400).json({ message: 'Invalid user ID' });
     }
 
-    // Check if a connection exists
+    // Check if a connection exists where the current user and the other user are involved
     const connection = await Connection.findOne({
       $or: [
         { requester: req.user.id, recipient: userId },
@@ -246,7 +252,7 @@ router.get('/status/:userId', auth, async (req, res) => {
     }
 
   } catch (error) {
-    console.error('Error fetching connection status:', error); // More specific logging
+    console.error('Error fetching connection status:', error); 
     res.status(500).json({ message: 'Server error' });
   }
 });

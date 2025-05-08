@@ -68,13 +68,11 @@ function Booking() {
           throw new Error(errorData.message || "Failed to fetch connected users");
         }
         const data = await response.json();
-        const currentUserId = localStorage.getItem("userId");
-        // Set the connectedUsers state with the other participant in each connection
-        setConnectedUsers(data.map((connection) => {
-          return connection.requester._id === currentUserId
-            ? connection.recipient
-            : connection.requester;
-        }));
+        
+        // Corrected logic: Backend now returns an array of user objects directly.
+        // Filter out any null/undefined entries and ensure each user object has an _id.
+        setConnectedUsers(data.filter(user => user && user._id)); 
+
       } catch (err) {
         setError(err.message || "Failed to fetch connected users");
         setConnectedUsers([]); // Use setConnectedUsers
