@@ -13,12 +13,13 @@ function Booking() {
   const [components, setComponents] = useState('Pending');
   const [pendingSessions, setPendingSessions] = useState([]);
   const [historySessions, setHistorySessions] = useState([]);
-  const [mentors, setMentors] = useState([]); 
+  // Renamed mentors to connectedUsers
+  const [connectedUsers, setConnectedUsers] = useState([]); 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    mentor: '', 
+    mentor: '', // This field still holds the recipient's ID
     date: '',
     time: '',
     duration: 60,
@@ -68,14 +69,15 @@ function Booking() {
         }
         const data = await response.json();
         const currentUserId = localStorage.getItem("userId");
-        setMentors(data.map((connection) => {
+        // Set the connectedUsers state with the other participant in each connection
+        setConnectedUsers(data.map((connection) => {
           return connection.requester._id === currentUserId
             ? connection.recipient
             : connection.requester;
         }));
       } catch (err) {
         setError(err.message || "Failed to fetch connected users");
-        setMentors([]);
+        setConnectedUsers([]); // Use setConnectedUsers
       } finally {
         setLoading(false);
       }
@@ -83,7 +85,7 @@ function Booking() {
     if (components === 'Create') {
       fetchConnectedUsers();
     } else {
-      setMentors([]); 
+      setConnectedUsers([]); // Use setConnectedUsers
     }
   }, [components]);
 
@@ -201,7 +203,7 @@ function Booking() {
 
   const validateForm = () => {
     if (!formData.mentor) {
-      setError('Please select a user to connect with');
+      setError('Please select a user to create a session with'); // Updated validation message
       return false;
     }
     if (!formData.date || !formData.time) {
@@ -241,7 +243,7 @@ function Booking() {
       const dateTime = new Date(`${formData.date}T${formData.time}`);
       const sessionDataToCreate = {
         ...formData,
-         mentee: user?._id, // Assuming the logged-in user is the mentee creating the session
+         mentee: user?._id, // The logged-in user is the initiator
          mentor: formData.mentor, // This is the ID of the selected user (recipient)
         date: dateTime.toISOString(),
         duration: parseInt(formData.duration),
@@ -304,7 +306,7 @@ function Booking() {
   };
 
   const getCreateButtonText = () => {
-    return userRole === 'mentor' ? 'Connect with User' : 'Create Session with User';
+    return userRole === 'mentor' ? 'Connect with User' : 'Create Session'; // Simplified button text
   };
 
   const displayComponent = () => {
@@ -326,8 +328,10 @@ function Booking() {
       case 'Pending':
         return (
           <>
-            <SessionNotification sessions={pendingSessions} />
-            <Pending sessions={pendingSessions} onJoinMeeting={joinJitsiMeeting} />
+            {/* SessionNotification is for browser notifications, doesn't render UI here */}
+            <SessionNotification sessions={pendingSessions} /> 
+            {/* Pending component displays the list of pending sessions */}
+            <Pending sessions={pendingSessions} onJoinMeeting={joinJitsiMeeting} onSessionUpdate={() => fetchData()} />
             <div className="mt-6">
               <h2 className="text-lg font-medium mb-4">Connection Requests</h2>
               {connectionRequests.length === 0 ? (
@@ -356,7 +360,6 @@ function Booking() {
                         >
                           Reject
                         </button>
-                         {/* Removed the unnecessary text here */}
                       </div>
                     </li>
                   ))}
@@ -380,17 +383,18 @@ function Booking() {
                 Select a User to Create Session With
               </label>
               <select
-                name="mentor"
+                name="mentor" // Keeping as 'mentor' to match backend API expected field name
                 value={formData.mentor}
                 onChange={handleChange}
                 required
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
               >
                 <option value="">Choose a connected user</option>
-                {mentors.length === 0 && !loading && (
+                {/* Iterate over connectedUsers instead of mentors */}
+                {connectedUsers.length === 0 && !loading && (
                   <option value="" disabled>No connected users found.</option>
                 )}
-                {mentors.map(user => (
+                {connectedUsers.map(user => (
                   <option key={user._id} value={user._id}>
                     {`${user.firstName} ${user.lastName}`}
                   </option>
@@ -513,10 +517,10 @@ function Booking() {
                 {submitting ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    {userRole === 'mentor' ? 'Connecting...' : 'Creating Session...'}
+                    {userRole === 'mentor' ? 'Creating session...' : 'Creating Session...'} // Simplified text
                   </>
                 ) : (
-                  getCreateButtonText()
+                  'Create Session' // Simplified button text
                 )}
               </button>
             </div>
