@@ -18,8 +18,13 @@ const Pending = ({ sessions, onJoinMeeting, onSessionUpdate }) => {
       const response = await sessionApi.updateStatus(sessionId, action);
 
       if (response.data) {
+        // Assuming onSessionUpdate is a function to re-fetch or update the sessions list
         if (onSessionUpdate) {
           onSessionUpdate();
+        } else {
+          // If no onSessionUpdate is provided, you might want to manually remove the session
+          // This part is optional and depends on how you manage state in the parent component
+          // setSessions(sessions.filter(session => session._id !== sessionId));
         }
       }
     } catch (error) {
@@ -48,9 +53,14 @@ const Pending = ({ sessions, onJoinMeeting, onSessionUpdate }) => {
 
       {sessions.map((session) => {
         const sessionDate = new Date(session.date);
-        const isMentor = user?.role === 'mentor';
-        const isCreator = session.mentor?._id === user?.id;
-        const otherParticipant = isMentor ? session.mentee : session.mentor;
+        // Determine if the current user is the creator (mentee field in backend) of the session
+        const isCreator = session.mentee?._id === user?._id; 
+        // Determine if the current user is the recipient (mentor field in backend) of the session
+        const isRecipient = session.mentor?._id === user?._id; 
+
+        // The other participant is the mentor if the current user is the creator (mentee),
+        // and the mentee if the current user is the recipient (mentor).
+        const otherParticipant = isCreator ? session.mentor : session.mentee;
         const isLoading = actionLoading === session._id;
 
         return (
@@ -61,9 +71,10 @@ const Pending = ({ sessions, onJoinMeeting, onSessionUpdate }) => {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100">
+                   {/* Display the other participant's profile image */}
                   <img
                     src={otherParticipant?.profileImage || '/default-avatar.png'}
-                    alt={`${otherParticipant?.name || 'User'}'s avatar`}
+                    alt={`${otherParticipant?.firstName || 'User'}'s avatar`}
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       e.target.src = '/default-avatar.png';
@@ -72,8 +83,11 @@ const Pending = ({ sessions, onJoinMeeting, onSessionUpdate }) => {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold">{session.topic}</h3>
+                  {/* Display clearer text based on who created the session */} 
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {isMentor ? 'Mentee' : 'Mentor'}: {otherParticipant?.name || 'Unknown User'}
+                    {isCreator
+                      ? `Request sent to ${otherParticipant?.firstName || 'Unknown User'} ${otherParticipant?.lastName || ''}`
+                      : `Request received from ${otherParticipant?.firstName || 'Unknown User'} ${otherParticipant?.lastName || ''}`}
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {session.type === 'one-on-one' ? 'One-on-One Session' : 'Group Session'}
@@ -115,51 +129,57 @@ const Pending = ({ sessions, onJoinMeeting, onSessionUpdate }) => {
                 </button>
               )}
 
-              {session.status === 'pending' && isMentor && !isCreator && (
-                <>
-                  <button
-                    onClick={() => handleSessionAction(session._id, 'accepted')}
-                    disabled={isLoading}
-                    className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors duration-200 disabled:opacity-50"
-                  >
-                    {isLoading ? (
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <FontAwesomeIcon icon={faCheck} className="w-4 h-4" />
-                    )}
-                    Accept
-                  </button>
-                  <button
-                    onClick={() => handleSessionAction(session._id, 'rejected')}
-                    disabled={isLoading}
-                    className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200 disabled:opacity-50"
-                  >
-                    {isLoading ? (
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <FontAwesomeIcon icon={faTimes} className="w-4 h-4" />
-                    )}
-                    Reject
-                  </button>
-                </>
+              {/* Action buttons for pending sessions */} 
+              {session.status === 'pending' && (
+                // If the current user is the recipient (mentor in the session object)
+                isRecipient ? (
+                  <>
+                    <button
+                      onClick={() => handleSessionAction(session._id, 'accepted')}
+                      disabled={isLoading}
+                      className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors duration-200 disabled:opacity-50"
+                    >
+                      {isLoading ? (
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <FontAwesomeIcon icon={faCheck} className="w-4 h-4" />
+                      )}
+                      Accept
+                    </button>
+                    <button
+                      onClick={() => handleSessionAction(session._id, 'rejected')}
+                      disabled={isLoading}
+                      className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200 disabled:opacity-50"
+                    >
+                      {isLoading ? (
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <FontAwesomeIcon icon={faTimes} className="w-4 h-4" />
+                      )}
+                      Reject
+                    </button>
+                  </>
+                ) : (
+                  // If the current user is the creator (mentee in the session object)
+                  isCreator && (
+                    <button
+                      onClick={() => handleSessionAction(session._id, 'cancelled')}
+                      disabled={isLoading}
+                      className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200 disabled:opacity-50"
+                    >
+                      {isLoading ? (
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <FontAwesomeIcon icon={faBan} className="w-4 h-4" />
+                      )}
+                      Cancel Session
+                    </button>
+                  )
+                )
               )}
 
-              {session.status === 'pending' && isCreator && (
-                <button
-                  onClick={() => handleSessionAction(session._id, 'cancelled')}
-                  disabled={isLoading}
-                  className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200 disabled:opacity-50"
-                >
-                  {isLoading ? (
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    <FontAwesomeIcon icon={faBan} className="w-4 h-4" />
-                  )}
-                  Cancel Session
-                </button>
-              )}
-
-              {session.status === 'accepted' && isMentor && (
+              {/* Mark as Completed button (only for the mentor of accepted sessions) */} 
+              {session.status === 'accepted' && session.mentor?._id === user?._id && (
                 <button
                   onClick={() => handleSessionAction(session._id, 'completed')}
                   disabled={isLoading}
@@ -167,23 +187,23 @@ const Pending = ({ sessions, onJoinMeeting, onSessionUpdate }) => {
                 >
                   {isLoading ? (
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    <FontAwesomeIcon icon={faCheck} className="w-4 h-4" />
-                  )}
-                  Mark as Completed
-                </button>
-              )}
+                    ) : (
+                      <FontAwesomeIcon icon={faCheck} className="w-4 h-4" />
+                      )}
+                      Mark as Completed
+                      </button>
+                      )}
 
-             
-            </div>
-            <p className="text-gray-600 text-md italic mt-2">
-                   Check your email for the conference call link.
-              </p>
-          </div>
-        );
-      })}
-    </div>
-  );
-};
+                             
+                            </div>
+                            <p className="text-gray-600 text-md italic mt-2">
+                                   Check your email for the conference call link.
+                              </p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                };
 
-export default Pending;
+                export default Pending;

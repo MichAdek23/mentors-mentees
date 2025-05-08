@@ -13,10 +13,11 @@ const router = express.Router();
 // @access  Private
 router.post('/create', auth, async (req, res) => {
   try {
-    const { mentor, date, duration, topic, type, notes, description } = req.body;
+    // Rename 'mentor' from req.body to 'recipientId' for clarity
+    const { mentor: recipientId, date, duration, topic, type, notes, description } = req.body;
 
     // Validate that the user is not trying to create a session with themselves
-    if (mentor === req.user.id) {
+    if (recipientId === req.user.id) {
       return res.status(400).json({ message: 'Cannot create a session with yourself' });
     }
 
@@ -24,8 +25,8 @@ router.post('/create', auth, async (req, res) => {
     const jitsiRoomId = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
 
     const session = new Session({
-      mentor,
-      mentee: req.user.id,
+      mentor: recipientId, // Store the recipientId in the 'mentor' field (schema requirement)
+      mentee: req.user.id, // The authenticated user is the initiator (mentee)
       date,
       duration,
       topic,
@@ -38,21 +39,21 @@ router.post('/create', auth, async (req, res) => {
 
     await session.save();
 
-    const mentorUser = await User.findById(mentor);
-    const menteeUser = await User.findById(req.user.id);
+    const recipientUser = await User.findById(recipientId); // Find the recipient user
+    const initiatorUser = await User.findById(req.user.id); // Find the initiator user
 
-    // Send session booking email
+    // Send session booking email to the recipient
     const emailData = {
-      recipientName: `${mentorUser.firstName} ${mentorUser.lastName}`,
-      creatorName: `${menteeUser.firstName} ${menteeUser.lastName}`,
+      recipientName: `${recipientUser.firstName} ${recipientUser.lastName}`,
+      creatorName: `${initiatorUser.firstName} ${initiatorUser.lastName}`,
       date,
       time: new Date(date).toLocaleTimeString(),
       topic,
       description,
-      acceptUrl: `${process.env.FRONTEND_URL}/sessions/${session._id}/accept`,
-      rejectUrl: `${process.env.FRONTEND_URL}/sessions/${session._id}/reject`,
+      acceptUrl: `${process.env.FRONTEND_URL}/sessions/action/${session._id}/accept`,
+      rejectUrl: `${process.env.FRONTEND_URL}/sessions/action/${session._id}/reject`,
     };
-    await sendSessionEmail(mentorUser.email, 'session-booking', emailData);
+    await sendSessionEmail(recipientUser.email, 'session-booking', emailData);
 
     res.status(201).json({ message: 'Session created successfully', session });
   } catch (error) {
@@ -62,10 +63,10 @@ router.post('/create', auth, async (req, res) => {
 });
 
 // @route   POST /api/sessions
-// @desc    Create a new session
+// @desc    Create a new session (alternative route, correcting variable name here too)
 // @access  Private
 router.post('/', auth, [
-  body('mentor', 'Mentor ID is required').notEmpty(),
+  body('mentor', 'Recipient ID is required').notEmpty(), // Updated validation message
   body('date', 'Date is required').notEmpty(),
   body('duration', 'Duration is required').isNumeric(),
   body('topic', 'Topic is required').notEmpty(),
@@ -77,11 +78,12 @@ router.post('/', auth, [
   }
 
   try {
-    const { mentor, date, duration, topic, type, notes, description } = req.body;
-    const mentee = req.user.id;
+    // Rename 'mentor' from req.body to 'recipientId' for clarity
+    const { mentor: recipientId, date, duration, topic, type, notes, description } = req.body;
+    const initiatorId = req.user.id; // The authenticated user is the initiator
 
     // Validate that the user is not trying to create a session with themselves
-    if (mentor === mentee) {
+    if (recipientId === initiatorId) {
       return res.status(400).json({ message: 'Cannot create a session with yourself' });
     }
 
@@ -89,8 +91,8 @@ router.post('/', auth, [
     const jitsiRoomId = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
 
     const session = new Session({
-      mentor,
-      mentee,
+      mentor: recipientId, // Store the recipientId in the 'mentor' field
+      mentee: initiatorId, // Store the initiatorId in the 'mentee' field
       date,
       duration,
       topic,
@@ -102,6 +104,11 @@ router.post('/', auth, [
     });
 
     await session.save();
+    
+    // Note: Email sending logic was only in the '/create' route. 
+    // If you need emails sent for this route as well, you would add it here, 
+    // similar to the logic in the '/create' route.
+
     res.status(201).json(session);
   } catch (error) {
     console.error('Error creating session:', error);
@@ -125,12 +132,12 @@ router.get('/', auth, async (req, res) => {
   try {
     const sessions = await Session.find({
       $or: [
-        { mentor: req.user.id },
-        { mentee: req.user.id }
+        { mentor: req.user.id }, // Current user is the recipient
+        { mentee: req.user.id }  // Current user is the initiator
       ]
     })
-    .populate('mentor', 'name email profileImage')
-    .populate('mentee', 'name email profileImage')
+    .populate('mentor', 'firstName lastName profileImage') // Populate mentor (recipient)
+    .populate('mentee', 'firstName lastName profileImage') // Populate mentee (initiator)
     .sort({ date: -1 });
 
     res.json(sessions);
@@ -148,14 +155,14 @@ router.get('/pending', auth, async (req, res) => {
     console.log('Authenticated user:', req.user); // Debug: Log the authenticated user
     const sessions = await Session.find({
       $or: [
-        { mentor: req.user.id },
-        { mentee: req.user.id }
+        { mentor: req.user.id }, // Current user is the recipient
+        { mentee: req.user.id }  // Current user is the initiator
       ],
       status: 'pending',
       date: { $gte: new Date() }
     })
-    .populate('mentor', 'name email profileImage')
-    .populate('mentee', 'name email profileImage')
+    .populate('mentor', 'firstName lastName profileImage') // Populate mentor (recipient)
+    .populate('mentee', 'firstName lastName profileImage') // Populate mentee (initiator)
     .sort({ date: 1 });
 
     res.json(sessions);
@@ -172,14 +179,14 @@ router.get('/accepted', auth, async (req, res) => {
   try {
     const sessions = await Session.find({
       $or: [
-        { mentor: req.user.id },
-        { mentee: req.user.id }
+        { mentor: req.user.id }, // Current user is the recipient
+        { mentee: req.user.id }  // Current user is the initiator
       ],
       status: 'accepted',
       date: { $gte: new Date() }
     })
-    .populate('mentor', 'name email profileImage')
-    .populate('mentee', 'name email profileImage')
+    .populate('mentor', 'firstName lastName profileImage') // Populate mentor (recipient)
+    .populate('mentee', 'firstName lastName profileImage') // Populate mentee (initiator)
     .sort({ date: 1 });
 
     res.json(sessions);
@@ -196,13 +203,13 @@ router.get('/history', auth, async (req, res) => {
   try {
     const sessions = await Session.find({
       $or: [
-        { mentor: req.user.id },
-        { mentee: req.user.id }
+        { mentor: req.user.id }, // Current user is the recipient
+        { mentee: req.user.id }  // Current user is the initiator
       ],
       status: 'completed'
     })
-    .populate('mentor', 'name email profileImage')
-    .populate('mentee', 'name email profileImage')
+    .populate('mentor', 'firstName lastName profileImage') // Populate mentor (recipient)
+    .populate('mentee', 'firstName lastName profileImage') // Populate mentee (initiator)
     .sort({ date: -1 });
 
     res.json(sessions);
@@ -218,8 +225,8 @@ router.get('/history', auth, async (req, res) => {
 router.get('/:id', auth, async (req, res) => {
   try {
     const session = await Session.findById(req.params.id)
-      .populate('mentor', 'name email profileImage')
-      .populate('mentee', 'name email profileImage');
+      .populate('mentor', 'firstName lastName profileImage') // Populate mentor (recipient)
+      .populate('mentee', 'firstName lastName profileImage'); // Populate mentee (initiator)
 
     if (!session) {
       return res.status(404).json({ message: 'Session not found' });
@@ -256,21 +263,21 @@ router.put('/:id/status', auth, async (req, res) => {
       return res.status(400).json({ message: 'Invalid status' });
     }
 
-    // Check if user is authorized to update this session
-    if (session.mentor.toString() !== req.user.id && session.mentee.toString() !== req.user.id) {
+    // Check if user is authorized to update this session (either initiator or recipient)
+    if (session.mentee.toString() !== req.user.id && session.mentor.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Not authorized to update this session' });
     }
 
-    const mentorUser = await User.findById(session.mentor);
-    const menteeUser = await User.findById(session.mentee);
+    const recipientUser = await User.findById(session.mentor); // Find the recipient user
+    const initiatorUser = await User.findById(session.mentee); // Find the initiator user
 
     session.status = status;
     await session.save();
 
     // Send appropriate email based on status
     const emailData = {
-      creatorName: `${menteeUser.firstName} ${menteeUser.lastName}`,
-      recipientName: `${mentorUser.firstName} ${mentorUser.lastName}`,
+      creatorName: `${initiatorUser.firstName} ${initiatorUser.lastName}`,
+      recipientName: `${recipientUser.firstName} ${recipientUser.lastName}`,
       date: session.date,
       time: new Date(session.date).toLocaleTimeString(),
       topic: session.topic,
@@ -280,16 +287,20 @@ router.put('/:id/status', auth, async (req, res) => {
 
     switch (status) {
       case 'accepted':
-        await sendSessionEmail(menteeUser.email, 'session-accepted', emailData);
+        // Send acceptance email to the initiator
+        await sendSessionEmail(initiatorUser.email, 'session-accepted', emailData);
         break;
       case 'rejected':
-        await sendSessionEmail(menteeUser.email, 'session-rejected', emailData);
+        // Send rejection email to the initiator
+        await sendSessionEmail(initiatorUser.email, 'session-rejected', emailData);
         break;
       case 'cancelled':
-        await sendSessionEmail(mentorUser.email, 'session-canceled', emailData);
+        // Send cancellation email to the recipient (since only creator can cancel)
+        await sendSessionEmail(recipientUser.email, 'session-canceled', emailData);
         break;
       case 'completed':
-        await sendSessionEmail(menteeUser.email, 'session-completed', emailData);
+        // Send completion email to the initiator (mentee)
+        await sendSessionEmail(initiatorUser.email, 'session-completed', emailData);
         break;
     }
 
@@ -300,11 +311,12 @@ router.put('/:id/status', auth, async (req, res) => {
   }
 });
 
-// Get all sessions for a mentee
+// Get all sessions for a mentee (This route name is now misleading - consider renaming)
 router.get('/mentee', auth, async (req, res) => {
   try {
+    // This route currently only fetches sessions where the authenticated user is the mentee (initiator)
     const sessions = await Session.find({ mentee: req.user.id })
-      .populate('mentor', 'name email profileImage')
+      .populate('mentor', 'firstName lastName profileImage') // Populate mentor (recipient)
       .sort({ date: 1 });
     res.json(sessions);
   } catch (error) {
@@ -315,16 +327,22 @@ router.get('/mentee', auth, async (req, res) => {
 // Get upcoming sessions
 router.get('/upcoming', auth, async (req, res) => {
   try {
+     // Update this query to include sessions where the user is either mentor or mentee
     const sessions = await Session.find({
-      mentee: req.user.id,
+      $or: [
+        { mentor: req.user.id }, // Current user is the recipient
+        { mentee: req.user.id }  // Current user is the initiator
+      ],
       date: { $gte: new Date() },
-      status: 'scheduled'
+      status: 'accepted' // Typically upcoming sessions are 'accepted'
     })
-      .populate('mentor', 'name email profileImage')
+      .populate('mentor', 'firstName lastName profileImage') // Populate mentor (recipient)
+      .populate('mentee', 'firstName lastName profileImage') // Populate mentee (initiator)
       .sort({ date: 1 })
       .limit(5);
     res.json(sessions);
   } catch (error) {
+    console.error('Error fetching upcoming sessions:', error); // Added logging
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -337,7 +355,7 @@ router.get('/upcoming/count', auth, async (req, res) => {
     const count = await Session.countDocuments({
       $or: [{ mentor: req.user.id }, { mentee: req.user.id }],
       date: { $gte: new Date() },
-      status: 'scheduled',
+      status: 'accepted', // Count accepted upcoming sessions
     });
 
     res.json({ count });
@@ -347,7 +365,8 @@ router.get('/upcoming/count', auth, async (req, res) => {
   }
 });
 
-// Update session status
+// Update session status (using PATCH - this might be redundant if PUT /:id/status is used)
+// Consider consolidating status updates to a single route (PUT is more common for full resource update)
 router.patch('/:id/status', auth, async (req, res) => {
   try {
     const session = await Session.findById(req.params.id);
@@ -356,13 +375,17 @@ router.patch('/:id/status', auth, async (req, res) => {
       return res.status(404).json({ message: 'Session not found' });
     }
 
-    // Check if user is authorized to update this session
+    // Check if user is authorized to update this session (either initiator or recipient)
     if (session.mentee.toString() !== req.user.id && session.mentor.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Not authorized' });
     }
 
     session.status = req.body.status;
     await session.save();
+
+    // Note: Email notifications are not sent in this PATCH route. 
+    // If you intend to use this route for status updates that trigger emails,
+    // you should add the email sending logic here, similar to the PUT route.
 
     res.json(session);
   } catch (error) {
@@ -379,7 +402,7 @@ router.post('/:id/feedback', auth, async (req, res) => {
       return res.status(404).json({ message: 'Session not found' });
     }
 
-    // Check if user is authorized to add feedback
+    // Check if user is authorized to add feedback (either initiator or recipient)
     if (session.mentee.toString() !== req.user.id && session.mentor.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Not authorized' });
     }

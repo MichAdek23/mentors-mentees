@@ -29,6 +29,7 @@ import DashboardLayout from './component/MeentoDashboard/DashboardLayout'; // Im
 import JitsiMeeting from './component/JitsiMeeting'; // Import JitsiMeeting component
 import NotFound from './components/NotFound'; // Import the NotFound component
 import Preloader from './components/Preloader'; // Import the Preloader component
+import SessionActionPage from './component/MeentoDashboard/MentorPages/SessionActionPage'; // Import the new component
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -77,6 +78,16 @@ function App() {
             }
           />
 
+          {/* Session Action Route (for email links) */}
+           <Route
+             path="/sessions/action/:sessionId/:action"
+             element={
+               <PrivateRoute>
+                 <SessionActionPage />
+               </PrivateRoute>
+             }
+           />
+
           {/* Mentor Dashboard Routes */}
           <Route
             path="/mentor-dashboard"
@@ -124,7 +135,7 @@ function App() {
             }
           />
 
-          {/* Protected routes */}
+          {/* Protected routes (can be moved inside DashboardLayout if preferred) */}
           <Route
             path="/profile/:userId"
             element={
@@ -133,6 +144,7 @@ function App() {
               </PrivateRoute>
             }
           />
+          {/* Note: There are duplicate message routes. Consider consolidating. */}
           <Route
             path="/messages"
             element={
@@ -157,7 +169,7 @@ function App() {
               </PrivateRoute>
             }
           />
-          <Route
+           <Route
             path="/public-profile/:userId"
             element={
               <PrivateRoute>
