@@ -6,7 +6,8 @@ import PublicProfile from "./PublicProfile"; // Import PublicProfile component
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 function Explore() {
-  const { upDatePage, handleToggleState } = useContext(GlobalContext); useContext(GlobalContext); // Add setSelectedUserForSession
+  // Corrected useContext usage and added setSelectedUserForSession
+  const { upDatePage, handleToggleState, setSelectedUserForSession } = useContext(GlobalContext); 
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,6 +20,7 @@ function Explore() {
     const fetchUsers = async () => {
       setLoading(true);
       try {
+        // Ensure profileImage is selected in the backend route for /users
         const response = await fetch(`${import.meta.env.VITE_API_URL}/users`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -36,21 +38,26 @@ function Explore() {
         // Fetch connection statuses for all users
         const statuses = {};
         for (const user of data) {
-          const statusResponse = await fetch(
-            `${import.meta.env.VITE_API_URL}/connections/status/${user._id}`,
-            {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-              },
-            }
-          );
+           // Add a check for user._id existence before fetching status
+           if (user._id) {
+              const statusResponse = await fetch(
+                `${import.meta.env.VITE_API_URL}/connections/status/${user._id}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                  },
+                }
+              );
 
-          if (statusResponse.ok) {
-            const statusData = await statusResponse.json();
-            statuses[user._id] = statusData.status;
-          } else {
-            statuses[user._id] = "none"; // Default to no connection
-          }
+              if (statusResponse.ok) {
+                const statusData = await statusResponse.json();
+                statuses[user._id] = statusData.status;
+              } else {
+                statuses[user._id] = "none"; // Default to no connection on error
+              }
+           } else {
+               console.warn('Skipping user with missing _id:', user);
+           }
         }
         setConnectionStatuses(statuses);
       } catch (err) {
@@ -104,6 +111,14 @@ function Explore() {
     navigate(`/public-profile/${userId}`); // Navigate to PublicProfile with userId in the URL
   };
 
+  // Added handler for the "Connected" button
+  const handleConnectedClick = (userId) => {
+      // You can add logic here to show a chat option or directly go to session creation
+      // For now, let's set the selected user for session creation and navigate to Booking
+      setSelectedUserForSession(userId);
+      upDatePage('Booking', 'Create'); // Assuming upDatePage can handle navigating to the 'Create' component in Booking
+  };
+
   if (loading) {
     return (
       <div className="h-screen flex items-center justify-center">
@@ -124,13 +139,18 @@ function Explore() {
   }
 
   const filteredUsers = users.filter((user) => {
+     // Add a check for user and user._id existence before filtering
+     if (!user || !user._id) {
+         return false;
+     }
+
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       return (
-        user.firstName.toLowerCase().includes(query) ||
-        user.lastName.toLowerCase().includes(query) ||
-        user.email.toLowerCase().includes(query) ||
-        user.role.toLowerCase().includes(query)
+        user.firstName?.toLowerCase().includes(query) || // Use optional chaining
+        user.lastName?.toLowerCase().includes(query) ||  // Use optional chaining
+        user.email?.toLowerCase().includes(query) ||    // Use optional chaining
+        user.role?.toLowerCase().includes(query)       // Use optional chaining
       );
     }
     return true;
@@ -208,6 +228,7 @@ function Explore() {
           {/* User Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredUsers.map((user) => (
+               // Add a check for user and user._id before rendering each grid item
               <div
                 key={user._id}
                 className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden hover:shadow-lg transform hover:-translate-y-2 transition-all duration-300"
@@ -215,15 +236,11 @@ function Explore() {
                 {/* User Image */}
                 <div className="relative h-48">
                   <img
-                    src={
-                      user.profilePicture?.startsWith("http")
-                        ? user.profilePicture
-                        : `${import.meta.env.VITE_BACKEND_URL}${user.profilePicture || "/uploads/profiles/default-profile.png"}`
-                    }
-                    alt={user.name}
+                    src={user.profileImage || "/uploads/profiles/default-profile.png"} // Simplified src
+                    alt={`${user.firstName || 'User'}'s avatar`} // Corrected alt text
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      e.currentTarget.src = `${import.meta.env.VITE_BACKEND_URL}/uploads/profiles/default-profile.png`;
+                      e.currentTarget.src = "/uploads/profiles/default-profile.png"; // Simplified fallback src
                     }}
                   />
                 </div>
@@ -231,19 +248,22 @@ function Explore() {
                 {/* User Info */}
                 <div className="p-6">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                    {`${user.firstName.toUpperCase()} ${user.lastName.toUpperCase()}`} {/* Convert names to uppercase */}
+                    {`${user.firstName?.toUpperCase() || ''} ${user.lastName?.toUpperCase() || ''}`} {/* Converted names to uppercase with optional chaining */}
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                     Role: {user.role || "N/A"}
                   </p>
                   <div className="flex flex-wrap gap-2 mb-6">
                     {user.interests?.map((interest, index) => (
-                      <span
-                        key={index}
-                        className="px-2 py-1 bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-300 text-xs rounded-full"
-                      >
-                        {interest}
-                      </span>
+                       // Add check for interest validity
+                       interest && (
+                           <span
+                             key={index}
+                             className="px-2 py-1 bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-300 text-xs rounded-full"
+                           >
+                             {interest}
+                           </span>
+                       )
                     ))}
                   </div>
 
@@ -257,8 +277,8 @@ function Explore() {
                     </button>
                     {connectionStatuses[user._id] === "accepted" ? (
                       <button
-                        onClick={() => alert("Start Chat or Create Session")}
-                        className="w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition-colors" // Use handleCreateSession
+                        onClick={() => handleConnectedClick(user._id)} // Call the new handler
+                        className="w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition-colors"
                       >
                         Connected
                       </button>
@@ -271,7 +291,7 @@ function Explore() {
                       </button>
                     ) : (
                       <button
-                        onClick={() => handleConnect(user._id)}
+                        onClick={() => handleConnect(user._id)} // Pass user._id to handleConnect
                         className="w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition-colors"
                       >
                         Connect
