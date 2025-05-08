@@ -26,6 +26,9 @@ const Pending = ({ sessions, onJoinMeeting, onSessionUpdate }) => {
           // This part is optional and depends on how you manage state in the parent component
           // setSessions(sessions.filter(session => session._id !== sessionId));
         }
+      } else if (response.error) {
+         // Handle backend errors returned in the response body
+         setActionError(response.error.message || response.error || `Failed to ${action} session.`);
       }
     } catch (error) {
       console.error(`Failed to ${action} session:`, error);
@@ -98,7 +101,7 @@ const Pending = ({ sessions, onJoinMeeting, onSessionUpdate }) => {
                   {/* Display clearer text based on who created the session */} 
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {isCreator
-                      ? `Request sent to ${otherParticipant?.firstName || 'Unknown User'} ${otherParticipant?.lastName || ''}`
+                      ? `You have just created a session with ${otherParticipant?.firstName || 'Unknown User'} ${otherParticipant?.lastName || ''}.`
                       : `Request received from ${otherParticipant?.firstName || 'Unknown User'} ${otherParticipant?.lastName || ''}`}
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -136,7 +139,15 @@ const Pending = ({ sessions, onJoinMeeting, onSessionUpdate }) => {
                   disabled={isLoading}
                   className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 disabled:opacity-50"
                 >
-                  <FontAwesomeIcon icon={faVideo} className="w-4 h-4" />
+                  {/* Check if otherParticipant is available before accessing profileImage */}
+                   <img
+                    src={otherParticipant?.profileImage || '/default-avatar.png'}
+                    alt="Jitsi Icon"
+                    className="w-4 h-4"
+                    onError={(e) => {
+                      e.target.src = '/default-avatar.png';
+                    }}
+                  />
                   Join Meeting
                 </button>
               )}
