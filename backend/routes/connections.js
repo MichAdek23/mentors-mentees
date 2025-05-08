@@ -166,19 +166,35 @@ router.put('/:connectionId/reject', auth, async (req, res) => {
 });
 
 // @route   GET api/connections
-// @desc    Get all connections for the current user
+// @desc    Get all connections for the current user and return connected users
 // @access  Private
 router.get('/', auth, async (req, res) => {
   try {
     const connections = await Connection.find({
       $or: [{ requester: req.user.id }, { recipient: req.user.id }],
+      status: 'accepted' // Only fetch accepted connections
     })
-      .populate('requester', 'firstName lastName email role')
-      .populate('recipient', 'firstName lastName email role');
+      .populate('requester', 'firstName lastName email role profileImage') // Populate with necessary user fields
+      .populate('recipient', 'firstName lastName email role profileImage'); // Populate with necessary user fields
 
-    res.json(connections);
+    const connectedUsers = [];
+    const connectedUserIds = new Set(); // Use a Set to track unique user IDs
+
+    connections.forEach(connection => {
+      const otherUser = connection.requester._id.toString() === req.user.id.toString()
+        ? connection.recipient
+        : connection.requester;
+
+      // Add the other user if their ID hasn't been added yet
+      if (!connectedUserIds.has(otherUser._id.toString())) {
+        connectedUsers.push(otherUser);
+        connectedUserIds.add(otherUser._id.toString());
+      }
+    });
+
+    res.json(connectedUsers);
   } catch (err) {
-    console.error(err.message);
+    console.error('Error fetching connected users:', err.message); // More specific logging
     res.status(500).send('Server Error');
   }
 });
@@ -192,11 +208,11 @@ router.get('/pending', auth, async (req, res) => {
       recipient: req.user.id,
       status: 'pending',
     })
-      .populate('requester', 'firstName lastName email role interests');
+      .populate('requester', 'firstName lastName email role interests profileImage'); // Populate with necessary user fields
 
     res.json(pendingConnections);
   } catch (err) {
-    console.error(err.message);
+    console.error('Error fetching pending connection requests:', err.message); // More specific logging
     res.status(500).send('Server Error');
   }
 });
@@ -223,11 +239,14 @@ router.get('/status/:userId', auth, async (req, res) => {
 
     if (!connection) {
       return res.status(200).json({ status: 'none' }); // No connection exists
+    } else if (connection.status === 'accepted') {
+      return res.status(200).json({ status: 'connected' }); // Use 'connected' for accepted
+    } else {
+      return res.status(200).json({ status: connection.status }); // pending, rejected, etc.
     }
 
-    res.status(200).json({ status: connection.status }); // Return the connection status
   } catch (error) {
-    console.error('Error fetching connection status:', error);
+    console.error('Error fetching connection status:', error); // More specific logging
     res.status(500).json({ message: 'Server error' });
   }
 });
