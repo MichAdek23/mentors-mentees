@@ -52,16 +52,28 @@ const Pending = ({ sessions, onJoinMeeting, onSessionUpdate }) => {
       )}
 
       {sessions.map((session) => {
+        // Add a check for valid session and participant data
+        if (!session || !session._id || !session.mentee || !session.mentor) {
+          console.warn('Skipping invalid session object:', session);
+          return null; // Skip rendering if session or participant data is missing
+        }
+
         const sessionDate = new Date(session.date);
         // Determine if the current user is the creator (mentee field in backend) of the session
-        const isCreator = session.mentee?._id === user?._id; 
+        const isCreator = session.mentee._id === user?._id; 
         // Determine if the current user is the recipient (mentor field in backend) of the session
-        const isRecipient = session.mentor?._id === user?._id; 
+        const isRecipient = session.mentor._id === user?._id; 
 
         // The other participant is the mentor if the current user is the creator (mentee),
         // and the mentee if the current user is the recipient (mentor).
         const otherParticipant = isCreator ? session.mentor : session.mentee;
         const isLoading = actionLoading === session._id;
+
+        // Add a check for valid otherParticipant after determining it
+         if (!otherParticipant || !otherParticipant._id) {
+             console.warn('Skipping session due to invalid other participant data:', session);
+             return null; // Skip rendering if other participant data is missing
+         }
 
         return (
           <div
