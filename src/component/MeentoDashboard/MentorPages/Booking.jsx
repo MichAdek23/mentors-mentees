@@ -5,21 +5,21 @@ import { faBars, } from '@fortawesome/free-solid-svg-icons';
 import Pending from './messageComponemts/Pending';
 import Histroy from './messageComponemts/histroy';
 import SessionNotification from './messageComponemts/SessionNotification';
-import { sessionApi } from '@/lib/api'; 
+import { sessionApi } from '@/lib/api';
 import { useNavigate } from 'react-router-dom';
 
 function Booking() {
-  const { upDatePage, handleToggleState, userRole, selectedUserForSession, user } = useContext(GlobalContext); 
+  const { upDatePage, handleToggleState, userRole, selectedUserForSession, user } = useContext(GlobalContext);
   const [components, setComponents] = useState('Pending');
   const [pendingSessions, setPendingSessions] = useState([]);
   const [historySessions, setHistorySessions] = useState([]);
   // Renamed mentors to connectedUsers
-  const [connectedUsers, setConnectedUsers] = useState([]); 
+  const [connectedUsers, setConnectedUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    mentor: '', // This field still holds the recipient's ID
+    recipientId: '', // Renamed from 'mentor' to be role-agnostic
     date: '',
     time: '',
     duration: 60,
@@ -37,6 +37,9 @@ function Booking() {
       setLoading(true);
       setError(null);
       try {
+        // The backend /sessions/pending and /sessions/history routes already fetch
+        // sessions where the current user is either the mentee or the mentor.
+        // We just need to set the state with the data returned.
         if (components === 'Pending') {
           const response = await sessionApi.getPending();
           setPendingSessions(response.data);
@@ -46,6 +49,8 @@ function Booking() {
         }
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to fetch data');
+         if (components === 'Pending') setPendingSessions([]);
+        else if (components === 'History') setHistorySessions([]);
       } finally {
         setLoading(false);
       }
@@ -68,10 +73,10 @@ function Booking() {
           throw new Error(errorData.message || "Failed to fetch connected users");
         }
         const data = await response.json();
-        
-        // Corrected logic: Backend now returns an array of user objects directly.
+
         // Filter out any null/undefined entries and ensure each user object has an _id.
-        setConnectedUsers(data.filter(user => user && user._id)); 
+        // Also, filter out the currently logged-in user from the list of connected users.
+        setConnectedUsers(data.filter(connectedUser => connectedUser && connectedUser._id && connectedUser._id !== user?._id));
 
       } catch (err) {
         setError(err.message || "Failed to fetch connected users");
@@ -80,12 +85,14 @@ function Booking() {
         setLoading(false);
       }
     };
+    // Fetch connected users only when the 'Create' component is active
     if (components === 'Create') {
       fetchConnectedUsers();
     } else {
-      setConnectedUsers([]); // Use setConnectedUsers
+      // Clear connected users list when not on the 'Create' tab
+      setConnectedUsers([]);
     }
-  }, [components]);
+  }, [components, user?._id]); // Added user?._id as a dependency
 
   useEffect(() => {
     const fetchConnectionRequests = async () => {
@@ -118,24 +125,24 @@ function Booking() {
     fetchConnectionRequests();
   }, [components]);
 
+  // Effect to pre-select user when navigating from another page (e.g., user profile)
   useEffect(() => {
     if (selectedUserForSession && components === "Create") {
       setFormData((prev) => ({
         ...prev,
-        mentor: selectedUserForSession, 
+        recipientId: selectedUserForSession,
       }));
+    } else if (selectedUserForSession && components !== "Create") {
+       // If selectedUserForSession is set but we are not on the 'Create' tab,
+       // navigate to 'Create' and set the recipient.
+       setComponents("Create");
+        setFormData((prev) => ({
+            ...prev,
+            recipientId: selectedUserForSession,
+        }));
     }
   }, [selectedUserForSession, components]);
 
-  useEffect(() => {
-    if (selectedUserForSession) {
-      setComponents("Create"); 
-      setFormData((prev) => ({
-        ...prev,
-        mentor: selectedUserForSession, 
-      }));
-    }
-  }, [selectedUserForSession]);
 
   const handleAcceptRequest = async (requestId) => {
     try {
@@ -200,8 +207,8 @@ function Booking() {
   };
 
   const validateForm = () => {
-    if (!formData.mentor) {
-      setError('Please select a user to create a session with'); // Updated validation message
+    if (!formData.recipientId) { // Changed from mentor to recipientId
+      setError('Please select a user to create a session with');
       return false;
     }
     if (!formData.date || !formData.time) {
@@ -221,7 +228,7 @@ function Booking() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -240,14 +247,24 @@ function Booking() {
 
       const dateTime = new Date(`${formData.date}T${formData.time}`);
       const sessionDataToCreate = {
-        ...formData,
-         mentee: user?._id, // The logged-in user is the initiator
-         mentor: formData.mentor, // This is the ID of the selected user (recipient)
+        // Send recipientId as 'mentor' to match backend schema for the recipient field
+        mentor: formData.recipientId,
+        // Send initiatorId as 'mentee' to match backend schema for the initiator field
+        // The backend determines the initiator based on the authenticated user (req.user.id)
+        // Sending mentee: user?._id here is redundant if the backend logic is correct
+        // but keeping it for now to match existing structure if needed.
+        mentee: user?._id,
         date: dateTime.toISOString(),
         duration: parseInt(formData.duration),
+        topic: formData.topic,
+        type: formData.type,
+        description: formData.description,
+        notes: formData.notes,
       };
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/sessions/create`, {
+      // We will use the /api/sessions POST route as it's more generic
+      // and less tied to a specific 'create' naming convention.
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/sessions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -261,11 +278,12 @@ function Booking() {
         throw new Error(errorData.message || "Failed to create session");
       }
 
-      const createdSession = await response.json(); 
+      const createdSession = await response.json();
        setSuccessMessage("Session created successfully! Waiting for recipient's confirmation."); // Set success message
 
       // Placeholder for sending a push notification to the recipient via backend
-      if (createdSession && createdSession.session && createdSession.session._id && formData.mentor) {
+      // This logic remains the same as the backend handles the recipientId correctly
+      if (createdSession && createdSession._id && formData.recipientId) { // Use createdSession._id
         try {
           const notifyResponse = await fetch(`${import.meta.env.VITE_API_URL}/notifications/send-session-request`, {
             method: 'POST',
@@ -274,8 +292,8 @@ function Booking() {
               Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({
-              recipientId: formData.mentor, 
-              sessionId: createdSession.session._id,
+              recipientId: formData.recipientId, // Use recipientId
+              sessionId: createdSession._id, // Use createdSession._id
               message: `You have a new session request for "${formData.topic}" from ${user?.firstName || 'a user'}.`,
             }),
           });
@@ -287,12 +305,17 @@ function Booking() {
         }
       }
 
-      setComponents("Pending");
+      // Reset form and navigate to Pending tab after successful creation
       setFormData({
-        mentor: "", date: "", time: "", duration: 60, topic: "",
+        recipientId: "", date: "", time: "", duration: 60, topic: "",
         type: "one-on-one", description: "", notes: "",
       });
+      setComponents("Pending"); // Navigate to Pending tab
+      // Optionally, refetch pending sessions after creation
+      fetchData(); // Call fetchData to refresh pending sessions
+
     } catch (err) {
+      console.error("Session creation error:", err);
       setError(err.message || "Failed to create session. Please try again.");
     } finally {
       setSubmitting(false);
@@ -303,8 +326,9 @@ function Booking() {
     window.open(`https://meet.jit.si/${roomId}`, '_blank');
   };
 
+  // Simplified button text to be role-agnostic
   const getCreateButtonText = () => {
-    return userRole === 'mentor' ? 'Connect with User' : 'Create Session'; // Simplified button text
+    return 'Create Session';
   };
 
   const displayComponent = () => {
@@ -322,14 +346,24 @@ function Booking() {
         </div>
       );
     }
+
+    // The backend /sessions/pending and /sessions/history routes already filter
+    // by status. We just need to ensure the component displays the fetched data.
+    // The client-side filtering logic below was potentially redundant 
+    // if the backend filtering is sufficient and correct.
+    // Let's revert to displaying the data directly fetched from the backend.
+
     switch (components) {
       case 'Pending':
         return (
           <>
             {/* SessionNotification is for browser notifications, doesn't render UI here */}
-            <SessionNotification sessions={pendingSessions} /> 
+            <SessionNotification sessions={pendingSessions} />
             {/* Pending component displays the list of pending sessions */}
+            {/* Pass the pendingSessions state directly */}
             <Pending sessions={pendingSessions} onJoinMeeting={joinJitsiMeeting} onSessionUpdate={() => fetchData()} />
+
+            {/* Display Connection Requests - This seems separate from session requests but is currently in the Pending tab */}
             <div className="mt-6">
               <h2 className="text-lg font-medium mb-4">Connection Requests</h2>
               {connectionRequests.length === 0 ? (
@@ -381,20 +415,20 @@ function Booking() {
                 Select a User to Create Session With
               </label>
               <select
-                name="mentor" // Keeping as 'mentor' to match backend API expected field name
-                value={formData.mentor}
+                name="recipientId" // Changed name to recipientId
+                value={formData.recipientId}
                 onChange={handleChange}
                 required
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
               >
                 <option value="">Choose a connected user</option>
-                {/* Iterate over connectedUsers instead of mentors */}
                 {connectedUsers.length === 0 && !loading && (
-                  <option value="" disabled>No connected users found.</option>
+                  <option value="" disabled>No connected users found or you are connected with yourself.</option>
                 )}
-                {connectedUsers.map(user => (
-                  <option key={user._id} value={user._id}>
-                    {`${user.firstName} ${user.lastName}`}
+                {connectedUsers.map(connectedUser => (
+                   // Ensure we use connectedUser._id for the value and connectedUser details for the display
+                  <option key={connectedUser._id} value={connectedUser._id}>
+                    {`${connectedUser.firstName} ${connectedUser.lastName}`}
                   </option>
                 ))}
               </select>
@@ -515,10 +549,10 @@ function Booking() {
                 {submitting ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    {userRole === 'mentor' ? 'Creating session...' : 'Creating Session...'} // Simplified text
+                    Creating Session...
                   </>
                 ) : (
-                  'Create Session' // Simplified button text
+                  'Create Session'
                 )}
               </button>
             </div>
