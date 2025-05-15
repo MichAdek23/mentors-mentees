@@ -9,6 +9,7 @@ import UserList from '../MeentoDashboard/MentorPages/UserList';
 import Settings from '../MeentoDashboard/MentorPages/Setting';
 import UsersList from '../MeentoDashboard/MentorPages/UsersList';
 import MenteeOverview from '../MeentoDashboard/MenteePages/Overview';
+import Message from "../Mentee-onboarding/messageComponent";
 
 export const GlobalContext = createContext();
 
@@ -22,7 +23,8 @@ const components = {
   UserList,
   Settings,
   UsersList,
-  MenteeOverview
+  MenteeOverview,
+  Message
 };
 
 const defaultProfile = {
