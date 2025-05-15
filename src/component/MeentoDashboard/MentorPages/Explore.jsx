@@ -5,8 +5,17 @@ import { GlobalContext } from "@/component/GlobalStore/GlobalState";
 import PublicProfile from "./PublicProfile"; // Import PublicProfile component
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 
+// Function to shuffle an array
+function shuffleArray(array) {
+    const newArray = [...array]; // Create a copy to avoid mutating the original array
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]]; // Swap elements
+    }
+    return newArray;
+}
+
 function Explore() {
-  // Corrected useContext usage and added setSelectedUserForSession
   const { upDatePage, handleToggleState, setSelectedUserForSession } = useContext(GlobalContext); 
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,29 +26,32 @@ function Explore() {
   const navigate = useNavigate(); // Initialize navigate
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
-        // Ensure profileImage is selected in the backend route for /users
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/users`, {
+        // Fetch all users
+        const usersResponse = await fetch(`${import.meta.env.VITE_API_URL}/users`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
 
-        if (!response.ok) {
-          const errorData = await response.json();
+        if (!usersResponse.ok) {
+          const errorData = await usersResponse.json();
           throw new Error(errorData.message || "Failed to fetch users");
         }
 
-        const data = await response.json();
-        setUsers(data);
+        const usersData = await usersResponse.json();
+
+        // Shuffle the users data before setting state
+        const shuffledUsers = shuffleArray(usersData);
+        setUsers(shuffledUsers);
 
         // Fetch connection statuses for all users
         const statuses = {};
-        for (const user of data) {
-           // Add a check for user._id existence before fetching status
+        for (const user of shuffledUsers) {
            if (user._id) {
+              // Using the existing route from the frontend code to check status
               const statusResponse = await fetch(
                 `${import.meta.env.VITE_API_URL}/connections/status/${user._id}`,
                 {
@@ -60,16 +72,17 @@ function Explore() {
            }
         }
         setConnectionStatuses(statuses);
+
       } catch (err) {
-        console.error("Error fetching users:", err);
-        setError(err.message || "Failed to fetch users");
+        console.error("Error fetching data:", err);
+        setError(err.message || "Failed to fetch data");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUsers();
-  }, []);
+    fetchData();
+  }, []); // Empty dependency array means this effect runs once on mount
 
   const handleConnect = async (userId) => {
     try {
@@ -98,8 +111,11 @@ function Explore() {
         throw new Error(errorData.message || "Failed to send connection request");
       }
 
-      alert("Connection request sent successfully!");
+      // Update status to pending after successful request
       setConnectionStatuses((prev) => ({ ...prev, [userId]: "pending" }));
+
+      alert("Connection request sent successfully!");
+      
     } catch (err) {
       console.error("Error sending connection request:", err);
       setError(err.message || "Failed to send connection request. Please try again.");
@@ -111,12 +127,9 @@ function Explore() {
     navigate(`/public-profile/${userId}`); // Navigate to PublicProfile with userId in the URL
   };
 
-  // Added handler for the "Connected" button
   const handleConnectedClick = (userId) => {
-      // You can add logic here to show a chat option or directly go to session creation
-      // For now, let's set the selected user for session creation and navigate to Booking
       setSelectedUserForSession(userId);
-      upDatePage('Booking', 'Create'); // Assuming upDatePage can handle navigating to the 'Create' component in Booking
+      upDatePage('Booking', 'Create'); 
   };
 
   if (loading) {
@@ -139,7 +152,6 @@ function Explore() {
   }
 
   const filteredUsers = users.filter((user) => {
-     // Add a check for user and user._id existence before filtering
      if (!user || !user._id) {
          return false;
      }
@@ -147,10 +159,10 @@ function Explore() {
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       return (
-        user.firstName?.toLowerCase().includes(query) || // Use optional chaining
-        user.lastName?.toLowerCase().includes(query) ||  // Use optional chaining
-        user.email?.toLowerCase().includes(query) ||    // Use optional chaining
-        user.role?.toLowerCase().includes(query)       // Use optional chaining
+        user.firstName?.toLowerCase().includes(query) || 
+        user.lastName?.toLowerCase().includes(query) ||  
+        user.email?.toLowerCase().includes(query) ||    
+        user.role?.toLowerCase().includes(query)       
       );
     }
     return true;
@@ -228,7 +240,6 @@ function Explore() {
           {/* User Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredUsers.map((user) => (
-               // Add a check for user and user._id before rendering each grid item
               <div
                 key={user._id}
                 className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden hover:shadow-lg transform hover:-translate-y-2 transition-all duration-300"
@@ -236,11 +247,11 @@ function Explore() {
                 {/* User Image */}
                 <div className="relative h-48">
                   <img
-                    src={user.profileImage || "/uploads/profiles/default-profile.png"} // Simplified src
-                    alt={`${user.firstName || 'User'}'s avatar`} // Corrected alt text
+                    src={user.profileImage || "/uploads/profiles/default-profile.png"}
+                    alt={`${user.firstName || 'User'}'s avatar`}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      e.currentTarget.src = "/uploads/profiles/default-profile.png"; // Simplified fallback src
+                      e.currentTarget.src = "/uploads/profiles/default-profile.png";
                     }}
                   />
                 </div>
@@ -248,14 +259,13 @@ function Explore() {
                 {/* User Info */}
                 <div className="p-6">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                    {`${user.firstName?.toUpperCase() || ''} ${user.lastName?.toUpperCase() || ''}`} {/* Converted names to uppercase with optional chaining */}
+                    {`${user.firstName?.toUpperCase() || ''} ${user.lastName?.toUpperCase() || ''}`}
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                     Role: {user.role || "N/A"}
                   </p>
                   <div className="flex flex-wrap gap-2 mb-6">
                     {user.interests?.map((interest, index) => (
-                       // Add check for interest validity
                        interest && (
                            <span
                              key={index}
@@ -270,17 +280,17 @@ function Explore() {
                   {/* Action Buttons */}
                   <div className="flex gap-2 flex-wrap">
                     <button
-                      onClick={() => handleViewProfile(user._id)} // Pass user._id to navigate
+                      onClick={() => handleViewProfile(user._id)}
                       className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-colors"
                     >
                       View Profile
                     </button>
-                    {connectionStatuses[user._id] === "accepted" ? (
+                    {connectionStatuses[user._id] === "connected" ? (
                       <button
-                        onClick={() => handleConnectedClick(user._id)} // Call the new handler
-                        className="w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition-colors"
+                        onClick={() => handleConnectedClick(user._id)}
+                        className="w-full bg-green-500 text-white py-2 rounded-lg cursor-pointer"
                       >
-                        Connected
+                        Create-session
                       </button>
                     ) : connectionStatuses[user._id] === "pending" ? (
                       <button
@@ -291,7 +301,7 @@ function Explore() {
                       </button>
                     ) : (
                       <button
-                        onClick={() => handleConnect(user._id)} // Pass user._id to handleConnect
+                        onClick={() => handleConnect(user._id)}
                         className="w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition-colors"
                       >
                         Connect
