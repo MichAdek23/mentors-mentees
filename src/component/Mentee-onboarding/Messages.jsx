@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import { GlobalContext } from '@/component/GlobalStore/GlobalState';
 import { useAuth } from '../../lib/AuthContext';
-import { io } from 'socket.io-client';
+// import { io } from 'socket.io-client'; // Removed socket.io import
 
 const Messages = () => {
   const { handleToggleState, upDatePage } = useContext(GlobalContext);
@@ -18,31 +18,33 @@ const Messages = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const messagesEndRef = useRef(null);
-  const socketRef = useRef();
+  // const socketRef = useRef(); // Removed socketRef
 
   useEffect(() => {
+    // Removed socket initialization and event listeners
     // Initialize socket connection
-    socketRef.current = io(`${import.meta.env.VITE_API_URL}/messages`, {
-      auth: {
-        token: localStorage.getItem('token')
-      }
-    });
+    // socketRef.current = io(`${import.meta.env.VITE_API_URL}/messages`, {
+    //   auth: {
+    //     token: localStorage.getItem('token')
+    //   }
+    // });
 
-    // Listen for new messages
-    socketRef.current.on('newMessage', (message) => {
-      if (activeConversation && (message.sender._id === activeConversation._id || message.recipient._id === activeConversation._id)) {
-        setMessages(prev => [...prev, message]);
-      }
-    });
+    // Removed Listen for new messages
+    // socketRef.current.on('newMessage', (message) => {
+    //   if (activeConversation && (message.sender._id === activeConversation._id || message.recipient._id === activeConversation._id)) {
+    //     setMessages(prev => [...prev, message]);
+    //   }
+    // });
 
     fetchConversations();
 
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-      }
-    };
-  }, [user, activeConversation]);
+    // Removed socket cleanup
+    // return () => {
+    //   if (socketRef.current) {
+    //     socketRef.current.disconnect();
+    //   }
+    // };
+  }, [user, activeConversation]); // Note: activeConversation in dependency array will trigger fetchConversations on change
 
   useEffect(() => {
     if (activeConversation) {
@@ -183,6 +185,9 @@ const Messages = () => {
       }
 
       setNewMessage('');
+      // To see the sent message immediately, you might need to re-fetch messages or add it to state manually
+      fetchMessages(activeConversation._id); // Re-fetch messages after sending
+
     } catch (err) {
       console.error('Error sending message:', err);
     }
