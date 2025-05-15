@@ -41,7 +41,7 @@ export default function Message() {
     
     const newMsg = {
       id: messages.length + 1,
-      senderId: 0, // Current user
+      senderId: 0, 
       text: newMessage,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
