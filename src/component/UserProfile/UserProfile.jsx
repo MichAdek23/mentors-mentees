@@ -140,12 +140,12 @@ const PublicProfile = () => {
             src={
               user.profilePicture?.startsWith("http")
                 ? user.profilePicture
-                : `${import.meta.env.VITE_BACKEND_URL}${user.profilePicture || "/uploads/profiles/default-profile.png"}`
+                : `https://mentors-mentees.onrender.com/uploads/profiles/${user.profilePicture || "default-profile.png"}`
             }
             alt={`${user.firstName} ${user.lastName}`}
             className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-md mb-4"
             onError={(e) => {
-              e.currentTarget.src = `${import.meta.env.VITE_BACKEND_URL}/uploads/profiles/default-profile.png`;
+              e.currentTarget.src = `https://mentors-mentees.onrender.com/uploads/profiles/default-profile.png`;
             }}
           />
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">

@@ -42,7 +42,8 @@ app.set('io', io);
 const allowedOrigins = [
   'https://leap-on-ng.vercel.app',
   'https://leap-on-ng.onrender.com',
-  'https://leapon.com.ng'
+  'https://leapon.com.ng',
+  'https://9000-firebase-david-1747302190095.cluster-c3a7z3wnwzapkx3rfr5kz62dac.cloudworkstations.dev'
 ];
 
 // Updated CORS configuration to allow multiple origins

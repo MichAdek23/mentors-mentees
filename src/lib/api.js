@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-export const API_URL = import.meta.env.VITE_API_URL || 'https://leapon.onrender.com/api'; 
+export const API_URL = import.meta.env.VITE_API_URL || 'https://mentors-mentees.onrender.com/api'; 
 
 // Ensure WebSocket URL is correct
-export const WS_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace(/^http/, 'ws') : 'wss://leapon.onrender.com/api';
+export const WS_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace(/^http/, 'ws') : 'wss://mentors-mentees.onrender.com/api';
 
 // Create axios instance with base URL
 const api = axios.create({

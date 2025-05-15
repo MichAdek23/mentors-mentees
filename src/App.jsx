@@ -5,8 +5,6 @@ import Login from './component/UserAuth/Login/Login';
 import SignUp from './component/UserAuth/register/SignUp';
 import EmailVerification from './component/UserAuth/EmailVerification';
 import UserProfile from './component/MeentoDashboard/MentorPages/PublicProfile';
-import Messages from './component/Mentee-onboarding/Messages';
-import MentorMessages from './component/MeentoDashboard/MentorPages/Message';
 import PrivateRoute from './component/UserAuth/PrivateRoute';
 import LandingPage from './component/Landing page/homecomponents/LandingPage';
 import ResetPassWord from './component/UserAuth/resetPassword/resetPassword';
@@ -104,7 +102,6 @@ function App() {
                 <DashboardLayout>
                   <Routes>
                     <Route path="booking" element={<Booking />} />
-                    <Route path="messages" element={<MentorMessages />} />
                     <Route path="requests" element={<Requests />} />
                   </Routes>
                 </DashboardLayout>
@@ -128,7 +125,6 @@ function App() {
                 <DashboardLayout>
                   <Routes>
                     <Route path="create-session" element={<CreateSession />} />
-                    <Route path="messages" element={<Messages />} />
                   </Routes>
                 </DashboardLayout>
               </PrivateRoute>
@@ -141,23 +137,6 @@ function App() {
             element={
               <PrivateRoute>
                 <UserProfile />
-              </PrivateRoute>
-            }
-          />
-          {/* Note: There are duplicate message routes. Consider consolidating. */}
-          <Route
-            path="/messages"
-            element={
-              <PrivateRoute>
-                <Messages />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/mentor/messages"
-            element={
-              <PrivateRoute>
-                <MentorMessages />
               </PrivateRoute>
             }
           />

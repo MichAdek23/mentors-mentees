@@ -1,13 +1,11 @@
 import React, { createContext, useMemo, useState } from "react";
 import Overview from "../MeentoDashboard/MentorPages/Overview";
 import Explore from "../MeentoDashboard/MentorPages/Explore";
-import Message from "../MeentoDashboard/MentorPages/Message";
 import Booking from "../MeentoDashboard/MentorPages/Booking";
 import MyProfile from "../MeentoDashboard/MentorPages/MyProfile";
 import Setting from "../MeentoDashboard/MentorPages/Setting";
 import ProfileId from "../MeentoDashboard/MentorPages/profileId";
 import UserList from '../MeentoDashboard/MentorPages/UserList';
-import Messages from '../MeentoDashboard/MentorPages/Message';
 import Settings from '../MeentoDashboard/MentorPages/Setting';
 import UsersList from '../MeentoDashboard/MentorPages/UsersList';
 import MenteeOverview from '../MeentoDashboard/MenteePages/Overview';
@@ -17,13 +15,11 @@ export const GlobalContext = createContext();
 const components = {
   Overview,
   Explore,
-  Message,
   Booking,
   Profile: MyProfile,
   Setting,
   ProfileId,
   UserList,
-  Messages,
   Settings,
   UsersList,
   MenteeOverview

@@ -15,13 +15,21 @@ import { useAuth } from '@/lib/AuthContext'; // Import useAuth
 // Add icons to the library
 library.add(faBars, faRemove, faTwitter, faFacebook, faWhatsapp, faInstagram, faLinkedin);
 
-// Function to get full image URL
+// Function to get the full URL for the profile picture.
+// It constructs the URL for the user's picture or the backend default.
 const getImageUrl = (imagePath) => {
-  if (!imagePath) return "/image/default-profile.png"; // Default image if no profile picture is provided
-  if (imagePath.startsWith('http')) {
-    return imagePath;
+  const backendDefaultPath = '/uploads/profiles/default-profile.png';
+
+  if (!imagePath || imagePath === backendDefaultPath) {
+    // If no imagePath is provided or it's the backend's default path,
+    // construct the full URL for the backend default.
+    return `${import.meta.env.VITE_API_URL}${backendDefaultPath}`;
   }
-  return `${import.meta.env.VITE_BACKEND_URL}${imagePath}`;
+  if (imagePath.startsWith('http')) {
+    return imagePath; // Return as is if it's a full URL (e.g., from a third-party service)
+  }
+  // Assume imagePath is a relative path from the backend like '/uploads/profiles/filename.png'
+  return `${import.meta.env.VITE_API_URL}${imagePath}`;
 };
 
 
@@ -72,10 +80,10 @@ const Profile = () => {
 
   const handleProfileUpdate = async (updatedProfile) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/users/profile`, { // Corrected URL
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/users/profile`, {
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${token}`, // Use token from useAuth
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(updatedProfile),
@@ -88,6 +96,8 @@ const Profile = () => {
 
       const data = await response.json();
       console.log('Profile updated successfully:', data);
+      // Re-fetch profile after successful update to ensure UI consistency
+      fetchProfile();
     } catch (err) {
       console.error('Error updating profile:', err);
       throw err;
@@ -102,12 +112,16 @@ const Profile = () => {
     setEditProfileVisible(!isEditProfileVisible);
   };
 
+  // Handle image loading errors by falling back to the backend-served default image
   const handleImageError = (e) => {
-    const originalSrc = e.currentTarget.src;
-    if (!originalSrc.includes('default-profile.png')) {
-      e.currentTarget.src = '/image/default-profile.png';
+    const defaultImageUrl = `${import.meta.env.VITE_API_URL}/uploads/profiles/default-profile.png`;
+    // If the image load failed and the current source is not already the default,
+    // set the source to the backend-served default image.
+    if (e.currentTarget.src !== defaultImageUrl) {
+      e.currentTarget.src = defaultImageUrl;
     }
   };
+
 
   const renderSocialLinks = () => {
     const socialLinks = [

@@ -16,13 +16,8 @@ import { useAuth } from '@/lib/AuthContext';
 const getImageUrl = (imagePath) => {
   if (!imagePath) return "/image/Subtract.png";
   if (imagePath.startsWith('http')) return imagePath;
-  if (imagePath.startsWith('/uploads')) {
-    return `${import.meta.env.VITE_API_URL || 'https://leapon.onrender.com'}${imagePath}`;
-  }
-  if (imagePath.startsWith('/api/uploads')) {
-    return `${import.meta.env.VITE_API_URL || 'https://leapon.onrender.com'}${imagePath.replace('/api', '')}`;
-  }
-  return imagePath;
+  // Assuming profile pictures are stored in backend/uploads/profiles
+  return `https://mentors-mentees.onrender.com/uploads/profiles/${imagePath}`;
 };
 
 function Setting() {
@@ -95,7 +90,7 @@ function Setting() {
                     department: userData.department || '',
                     expertise: userData.expertise || [],
                     experience: userData.experience || '',
-                    interests: userData.interests || []
+                    interests: []
                 });
             } catch (error) {
                 console.error('Error fetching profile:', error);

@@ -14,6 +14,17 @@ const PublicProfile = () => {
   const [error, setError] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState(null); // Track connection status
 
+  // Function to get full image URL using VITE_API_URL
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return "/image/default-profile.png"; // Default image
+    if (imagePath.startsWith('http')) {
+      return imagePath; // Return as is if it's a full URL
+    }
+    // Assuming imagePath is a relative path like /uploads/profiles/filename.png
+    return `${import.meta.env.VITE_API_URL}${imagePath}`;
+  };
+
+
   useEffect(() => {
     const fetchUser = async () => {
       setLoading(true);
@@ -134,35 +145,31 @@ const PublicProfile = () => {
         Public Profile
       </h1>
     </header>
-  
+
     {/* Profile Card */}
     <div className="w-full max-w-6xl bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex flex-col md:flex-row">
       {/* Left Section: Image and Interests */}
       <div className="w-full md:w-1/3 bg-gray-100 dark:bg-gray-700 p-6 flex flex-col items-center">
         <img
-          src={
-            user.profilePicture?.startsWith("http")
-              ? user.profilePicture
-              : `${import.meta.env.VITE_BACKEND_URL}${user.profilePicture || "/uploads/profiles/default-profile.png"}`
-          }
+          src={getImageUrl(user.profilePicture)}
           alt={`${user.firstName} ${user.lastName}`}
           className="w-32 h-32 sm:w-40 sm:h-40 md:w-full md:h-48 object-cover border-4 border-white shadow-md mb-4 rounded"
           onError={(e) => {
-            e.currentTarget.src = `${import.meta.env.VITE_BACKEND_URL}/uploads/profiles/default-profile.png`;
+            e.currentTarget.src = "/image/default-profile.png"; // Use default image on error
           }}
         />
-  
+
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           Interests
         </h3>
-  
+
         <div className="flex flex-wrap gap-2 justify-center">
           {user.interests?.length > 0 ? (
             user.interests.map((interest, index) => (
               <span
                 key={index}
                 className="px-3 py-1 bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-300 text-xs rounded-full"
-              >
+                >
                 {interest}
               </span>
             ))
@@ -173,23 +180,23 @@ const PublicProfile = () => {
           )}
         </div>
       </div>
-  
+
       {/* Right Section: Details */}
       <div className="w-full md:w-2/3 p-6">
         <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 text-center md:text-left">
           {`${user.firstName} ${user.lastName}`}
         </h2>
-  
+
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 flex items-center gap-2 justify-center md:justify-start">
           <FontAwesomeIcon icon={faEnvelope} />
           {user.email}
         </p>
-  
+
         <div className="mb-4">
           <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">Role</h3>
           <p className="text-sm text-gray-600 dark:text-gray-400">{user.role}</p>
         </div>
-  
+
         <div className="mb-4">
           <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">Bio</h3>
           <p
@@ -199,7 +206,7 @@ const PublicProfile = () => {
             {user.bio || "No bio available"}
           </p>
         </div>
-  
+
         {/* LinkedIn */}
         {user.linkedin && (
           <div className="mb-6">
@@ -214,7 +221,7 @@ const PublicProfile = () => {
             </a>
           </div>
         )}
-  
+
         {/* Buttons */}
         <div className="mt-6 space-y-4">
           {connectionStatus === "accepted" ? (
@@ -254,7 +261,7 @@ const PublicProfile = () => {
       </div>
     </div>
   </div>
-  
+
   );
 };
 

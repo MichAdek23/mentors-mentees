@@ -9,15 +9,12 @@ import {
 import { userApi } from '@/lib/api';
 
 const getImageUrl = (imagePath) => {
-  if (!imagePath) return "/image/Subtract.png";
-  if (imagePath.startsWith('http')) return imagePath;
-  if (imagePath.startsWith('/uploads')) {
-    return `${import.meta.env.VITE_API_URL || 'https://leapon.onrender.com'}${imagePath}`;
+  if (!imagePath) return "/image/Subtract.png"; // Default image if no profile picture is provided
+  if (imagePath.startsWith('http')) {
+    return imagePath; // Return as is if it's a full URL
   }
-  if (imagePath.startsWith('/api/uploads')) {
-    return `${import.meta.env.VITE_API_URL || 'https://leapon.onrender.com'}${imagePath.replace('/api', '')}`;
-  }
-  return imagePath;
+  // Assuming imagePath is just the filename relative to backend/uploads/profiles
+  return `${import.meta.env.VITE_API_URL}/uploads/profiles/${imagePath}`;
 };
 
 const EditProfile = ({ profile, onUpdate, setIsEditProfileVisible }) => {
@@ -84,6 +81,11 @@ const EditProfile = ({ profile, onUpdate, setIsEditProfileVisible }) => {
         localStorage.setItem('userData', JSON.stringify(userData));
 
         setError(null);
+         // Call onUpdate to trigger a re-fetch or state update in the parent component
+        if (onUpdate) {
+            onUpdate({ ...profile, profilePicture: response.data.profilePicture });
+        }
+
       } catch (error) {
         console.error('Error uploading image:', error);
         setError(error.message || 'Failed to upload image. Please try again.');
