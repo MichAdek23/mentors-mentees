@@ -22,7 +22,7 @@ const Messages = () => {
 
   useEffect(() => {
     // Initialize socket connection
-    socketRef.current = io(import.meta.env.VITE_API_URL, {
+    socketRef.current = io(`${import.meta.env.VITE_API_URL}/messages`, {
       auth: {
         token: localStorage.getItem('token')
       }
@@ -269,7 +269,7 @@ const Messages = () => {
                   key={conversation._id}
                   onClick={() => setActiveConversation(conversation)}
                   className={`p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 ${
-                    activeConversation?._id === conversation._id ? 'bg-gray-50 dark:bg-gray-700' : ''
+                    activeConversation?._id === conversation.id ? 'bg-gray-50 dark:bg-gray-700' : ''
                   }`}
                 >
                   <div className="flex items-center gap-4">
