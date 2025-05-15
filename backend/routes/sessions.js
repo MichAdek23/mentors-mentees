@@ -439,13 +439,13 @@ router.put('/:id/status', auth, async (req, res) => {
                     await sendSessionEmail(userInMentorField.email, 'session-completed', emailData);
                      console.log(`Session completed email sent to user in mentor field: ${userInMentorField.email}`);
                  } catch (emailErr) {
-                    console.error(`Failed to send session completed email to user in mentor field ${userInMentorField.email}:`, emailErr);
+                     console.error(`Failed to send session completed email to user in mentor field ${userInMentorField.email}:`, emailErr);
                  }
             }
             break;
     }
 
-    res.json(session);
+    res.json({ data: session });
   } catch (err) {
     console.error('Error updating session status:', err);
     res.status(500).json({ message: 'Server error while updating session status' });
