@@ -2,6 +2,7 @@ import express from 'express';
 import { auth } from '../middleware/auth.js';
 import Connection from '../models/Connection.js';
 import User from '../models/User.js';
+import Conversation from '../models/Conversation.js'; // Import Conversation model
 import { sendConnectionEmail } from '../services/emailService.js';
 import mongoose from 'mongoose';
 
@@ -40,10 +41,12 @@ router.post('/request', auth, async (req, res) => {
     await connection.save();
 
     // Emit socket event for new connection request
+    // Assuming recipientId is the socket ID or user ID for targeting
     req.app.get('io').to(recipientId).emit('newConnectionRequest', {
       requester: req.user.id,
-      requesterName: req.user.name
+      requesterName: `${req.user.firstName} ${req.user.lastName}`.trim() // Use actual name from user object
     });
+
 
     res.json(connection);
   } catch (err) {
@@ -101,12 +104,16 @@ router.post('/send-request', auth, async (req, res) => {
       rejectUrl: `${process.env.FRONTEND_URL}/connections/${connection._id}/reject`,
     };
 
-    try {
-      await sendConnectionEmail(recipient.email, emailTemplate, emailData);
-    } catch (templateError) {
-      console.error('Error loading email template:', templateError);
-      return res.status(500).json({ message: 'Failed to load email template' });
-    }
+    // Using setTimeout to send email asynchronously so it doesn't block the response
+    setTimeout(async () => {
+        try {
+            await sendConnectionEmail(recipient.email, emailTemplate, emailData);
+            console.log(`Connection email sent to ${recipient.email}`);
+        } catch (emailErr) {
+            console.error('Error sending connection email:', emailErr);
+            // Optionally log this error to an external logging service
+        }
+    }, 0); // Use 0 delay to push to the event loop
 
     res.status(200).json({ message: 'Connection request sent successfully', connection });
   } catch (error) {
@@ -116,7 +123,7 @@ router.post('/send-request', auth, async (req, res) => {
 });
 
 // @route   PUT api/connections/:connectionId/accept
-// @desc    Accept a connection request
+// @desc    Accept a connection request and create conversation
 // @access  Private
 router.put('/:connectionId/accept', auth, async (req, res) => {
   try {
@@ -126,16 +133,52 @@ router.put('/:connectionId/accept', auth, async (req, res) => {
       return res.status(404).json({ message: 'Connection not found' });
     }
 
+    // Ensure the authenticated user is the recipient of the connection request
     if (connection.recipient.toString() !== req.user.id) {
       return res.status(401).json({ message: 'Not authorized' });
     }
 
+    // Check if the connection is already accepted
+    if (connection.status === 'accepted') {
+        return res.status(400).json({ message: 'Connection already accepted' });
+    }
+
+    // Update connection status to accepted
     connection.status = 'accepted';
     await connection.save();
 
+    // --- Conversation Creation Logic ---
+    const participant1 = connection.requester;
+    const participant2 = connection.recipient;
+
+    // Check if a conversation already exists between these two users
+    const existingConversation = await Conversation.findOne({
+      participants: { $all: [participant1, participant2] }
+    });
+
+    if (!existingConversation) {
+      // If no conversation exists, create a new one
+      const newConversation = new Conversation({
+        participants: [participant1, participant2],
+        // You might want to add other default fields if your Conversation model has them
+      });
+      await newConversation.save();
+      console.log(`New conversation created between ${participant1} and ${participant2}`);
+       // Optionally emit a socket event to notify users about the new conversation
+       req.app.get('io').to(participant1.toString()).emit('newConversation', newConversation);
+       req.app.get('io').to(participant2.toString()).emit('newConversation', newConversation);
+
+    } else {
+        console.log(`Conversation already exists between ${participant1} and ${participant2}`);
+         // Optionally emit a socket event even if conversation existed, to prompt a UI refresh
+         req.app.get('io').to(participant1.toString()).emit('existingConversation', existingConversation);
+         req.app.get('io').to(participant2.toString()).emit('existingConversation', existingConversation);
+    }
+    // --- End Conversation Creation Logic ---
+
     res.json({ message: 'Connection accepted successfully', connection });
   } catch (err) {
-    console.error(err.message);
+    console.error('Error accepting connection request:', err.message);
     res.status(500).send('Server Error');
   }
 });
