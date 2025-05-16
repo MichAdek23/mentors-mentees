@@ -62,8 +62,9 @@ function Message() {
       setLoadingMessages(true);
       try {
         const token = localStorage.getItem("token");
+        // Corrected API endpoint to fetch conversation by ID which includes messages
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/messages/conversations/${selectedConversation._id}`,
+          `${import.meta.env.VITE_API_URL}/conversations/${selectedConversation._id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -77,11 +78,11 @@ function Message() {
         }
 
         const data = await response.json();
-        // Ensure data.messages is an array before setting messages
-        if (Array.isArray(data.messages)) {
+        // The /conversations/:id route returns a conversation object with a 'messages' array
+        if (data && Array.isArray(data.messages)) {
             setMessages(data.messages);
         } else {
-            console.error("API did not return an array for messages:", data);
+            console.error("API response did not contain a messages array:", data);
             setMessages([]); // Set to empty array if unexpected format
         }
 
@@ -247,7 +248,7 @@ function Message() {
 
             <div className="flex-grow overflow-y-auto">
               {loadingConnectedUsers ? (
-                <div className="p-4">Loading connected users...</div> 
+                <div className="p-4">Loading connected users...</div>
               ) : error ? (
                  <div className="p-4 text-red-500">Error: {error}</div>
               ) : connectedUsers.length === 0 ? (
@@ -325,7 +326,7 @@ function Message() {
 
           <div className="flex-grow overflow-y-auto">
              {loadingConnectedUsers ? (
-                <div className="p-4">Loading connected users...</div> 
+                <div className="p-4">Loading connected users...</div>
               ) : error ? (
                  <div className="p-4 text-red-500">Error: {error}</div>
               ) : connectedUsers.length === 0 ? (
@@ -377,7 +378,7 @@ function Message() {
                 <Menu size={20} />
               </button>
               {selectedChatUser ? (
-                 <h1 className="text-xl font-bold" id="main-title">{`${selectedChatUser.firstName || ''} ${selectedChatUser.lastName || ''}`.trim() || 'Select a connected user'}</h1> 
+                 <h1 className="text-xl font-bold" id="main-title">{`${selectedChatUser.firstName || ''} ${selectedChatUser.lastName || ''}`.trim() || 'Select a connected user'}</h1>
               ) : (
                  <h1 className="text-xl font-bold" id="main-title">Select a connected user</h1> 
               )}
@@ -415,14 +416,14 @@ function Message() {
              <div className="flex items-center justify-center h-full">Loading messages...</div>
           ) : error ? (
              <div className="flex items-center justify-center h-full text-red-500">Error loading messages: {error}</div>
-          ) : messages.length === 0 ? (
+          ) : Array.isArray(messages) && messages.length === 0 ? (
             selectedChatUser && (
              <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
                 No messages yet with {`${selectedChatUser.firstName || ''} ${selectedChatUser.lastName || ''}`.trim() || 'this user'}. Start the conversation!
              </div>
             )
           ) : (
-            messages.map((msg) => {
+            Array.isArray(messages) && messages.map((msg) => {
               const isCurrentUser = msg.sender === userId;
               // Find the correct sender object from either profile (current user) or connectedUsers (other user)
               const sender = isCurrentUser ? profile : connectedUsers.find(user => user._id === msg.sender);
